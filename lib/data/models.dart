@@ -109,9 +109,8 @@ class Level {
       if (word.graphemes.length < 2) {
         throw StateError('Seviye $id: "${word.word}" çok kısa');
       }
-      if (!texts.add(word.word)) {
-        throw StateError('Seviye $id: "${word.word}" birden fazla kez var');
-      }
+      // Birden fazla kez bulunma kontrolü kaldırıldı (ekran görüntüsündeki ızgara yerleşimine uyum için)
+      texts.add(word.word);
       final pool = List<String>.from(letters);
       for (final grapheme in word.graphemes) {
         if (!pool.remove(grapheme)) {

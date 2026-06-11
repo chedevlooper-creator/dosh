@@ -1,3 +1,8 @@
 {
-  "app_title": "Дош"
+  "app_title": "Дош",
+  "start": "Başla",
+  "level_1": "Seviye 1",
+  "level_2": "Seviye 2",
+  "level_3": "Seviye 3",
+  "level_4": "Seviye 4"
 }

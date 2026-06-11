@@ -1,6 +1,18 @@
 [
   {
     "id": 1,
+    "letters": ["д", "о", "ш", "о"],
+    "words": [
+      { "word": "до", "row": 0, "col": 3, "dir": "across" },
+      { "word": "дош", "row": 0, "col": 3, "dir": "down" },
+      { "word": "дош", "row": 2, "col": 1, "dir": "across" },
+      { "word": "дошо", "row": 2, "col": 1, "dir": "down" },
+      { "word": "шод", "row": 4, "col": 3, "dir": "across" },
+      { "word": "до", "row": 5, "col": 5, "dir": "down" }
+    ]
+  },
+  {
+    "id": 2,
     "letters": ["м", "а", "л", "х"],
     "words": [
       { "word": "малх", "row": 0, "col": 0, "dir": "across" },
@@ -9,7 +21,7 @@
     ]
   },
   {
-    "id": 2,
+    "id": 3,
     "letters": ["к", "о", "р", "т", "а"],
     "words": [
       { "word": "корта", "row": 0, "col": 0, "dir": "across" },
@@ -17,7 +29,7 @@
     ]
   },
   {
-    "id": 3,
+    "id": 4,
     "letters": ["д", "а", "д", "а"],
     "words": [
       { "word": "дада", "row": 0, "col": 0, "dir": "across" },

@@ -196,11 +196,10 @@ class _LetterCellState extends State<_LetterCell>
                               widget.letter,
                               style: TextStyle(
                                 fontSize: widget.size * 0.55,
-                                fontWeight: FontWeight.w800,
+                                fontWeight: FontWeight.w900,
                                 color: solved
-                                    ? Colors.white
+                                    ? AppColors.ink
                                     : AppColors.goldDark,
-                                shadows: solved ? kSoftTextShadow : null,
                               ),
                             ),
                           ),

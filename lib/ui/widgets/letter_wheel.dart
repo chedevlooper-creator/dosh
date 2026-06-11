@@ -262,67 +262,56 @@ class _BubbleState extends State<_Bubble> {
       onEnter: (_) => setState(() => _hovered = true),
       onExit: (_) => setState(() => _hovered = false),
       child: AnimatedScale(
-        scale: selected ? 1.15 : (_hovered ? 1.07 : 1.0),
+        scale: selected ? 1.18 : (_hovered ? 1.08 : 1.0),
         duration: const Duration(milliseconds: 120),
         child: Container(
           width: r * 2,
           height: r * 2,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            // Sol üstten vuran ışık: baloncuklara mücevher derinliği verir.
-            gradient: RadialGradient(
-              center: const Alignment(-0.35, -0.42),
-              radius: 1.25,
-              colors: selected
-                  ? const [
+            // Seçili harfler için altın parlama efekti; seçilmemişler için şeffaf zemin.
+            gradient: selected
+                ? const RadialGradient(
+                    center: Alignment(-0.35, -0.42),
+                    radius: 1.25,
+                    colors: [
                       Color(0xFFFFF3C0),
                       Color(0xFFFFE48A),
                       AppColors.goldLight,
                       AppColors.gold,
-                    ]
-                  : const [
-                      Color(0xFFFFE9A8),
-                      AppColors.goldLight,
-                      AppColors.gold,
-                      AppColors.goldDark,
                     ],
-              stops: const [0, 0.35, 0.72, 1],
-            ),
-            border: Border.all(color: const Color(0x4DFFFFFF), width: 1.5),
+                    stops: [0, 0.35, 0.72, 1],
+                  )
+                : null,
+            border: selected
+                ? Border.all(color: const Color(0x80FFFFFF), width: 1.5)
+                : null,
             boxShadow: [
               if (selected)
                 const BoxShadow(
                   color: Color(0x99F5B62B),
                   blurRadius: 16,
                   spreadRadius: 1,
-                )
-              else
-                const BoxShadow(
-                  color: Color(0x40000000),
-                  blurRadius: 8,
-                  offset: Offset(0, 3),
                 ),
             ],
           ),
           child: Center(
-            child: Padding(
-              padding: EdgeInsets.all(r * 0.22),
-              child: FittedBox(
-                child: Text(
-                  widget.label,
-                  style: TextStyle(
-                    fontSize: r,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.white,
-                    shadows: const [
-                      Shadow(
-                        color: Color(0x59000000),
-                        blurRadius: 4,
-                        offset: Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                ),
+            child: Text(
+              widget.label,
+              style: TextStyle(
+                fontFamily: 'Georgia',
+                fontSize: r * 0.96,
+                fontWeight: FontWeight.bold,
+                color: selected ? Colors.white : const Color(0xFF122C3D),
+                shadows: selected
+                    ? const [
+                        Shadow(
+                          color: Color(0x59000000),
+                          blurRadius: 4,
+                          offset: Offset(0, 2),
+                        ),
+                      ]
+                    : null,
               ),
             ),
           ),

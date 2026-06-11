@@ -81,9 +81,13 @@ class _RoundIconButtonState extends State<RoundIconButton>
         height: widget.size,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: _hovered && active
-              ? AppColors.barButtonHover
-              : AppColors.barButton,
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: _hovered && active
+                ? const [Color(0xCCFFFFFF), Color(0x8CFFFFFF)]
+                : const [Color(0x8CFFFFFF), Color(0x42FFFFFF)],
+          ),
           border: Border.all(color: const Color(0x80FFFFFF), width: 1.4),
           boxShadow: const [
             BoxShadow(
@@ -93,7 +97,8 @@ class _RoundIconButtonState extends State<RoundIconButton>
             ),
           ],
         ),
-        child: Icon(widget.icon, size: widget.size * 0.52, color: AppColors.ink),
+        child:
+            Icon(widget.icon, size: widget.size * 0.52, color: AppColors.ink),
       ),
     );
 

@@ -1,6 +1,7 @@
 import 'package:dosh/app.dart';
 import 'package:dosh/data/models.dart';
 import 'package:dosh/data/progress_store.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -17,16 +18,34 @@ Level _malxLevel() => Level(
     );
 
 Future<ProgressStore> _freshStore() async {
-  SharedPreferences.setMockInitialValues({});
+  SharedPreferences.setMockInitialValues({'sound_on': false});
   return ProgressStore.create();
 }
 
+Future<void> _pumpAndStartGame(WidgetTester tester, ProgressStore store) async {
+  await tester.pumpWidget(DoshApp(levels: [_malxLevel()], store: store));
+  await tester.pump();
+
+  expect(find.text('Дош'), findsOneWidget);
+  expect(find.text('Başla'), findsOneWidget);
+
+  await tester.tap(find.byKey(const ValueKey('home_play')));
+  await tester.pump();
+  await tester.pump(const Duration(milliseconds: 500));
+}
+
 void main() {
-  testWidgets('oyun ekranı kurulur: başlık anahtarı ve çark harfleri görünür',
+  testWidgets('ana sayfa kurulur ve oyuna geçer', (tester) async {
+    final store = await _freshStore();
+    await _pumpAndStartGame(tester, store);
+
+    expect(find.text('level_1'), findsOneWidget);
+  });
+
+  testWidgets('oyun ekranında başlık anahtarı ve çark harfleri görünür',
       (tester) async {
     final store = await _freshStore();
-    await tester.pumpWidget(DoshApp(levels: [_malxLevel()], store: store));
-    await tester.pump();
+    await _pumpAndStartGame(tester, store);
 
     // Çeçence çevirisi olmayan başlık, teknik anahtar olarak görünür.
     expect(find.text('level_1'), findsOneWidget);
@@ -41,8 +60,7 @@ void main() {
   testWidgets('sürükleyerek kelime çözmek grid ve coin kutusunu günceller',
       (tester) async {
     final store = await _freshStore();
-    await tester.pumpWidget(DoshApp(levels: [_malxLevel()], store: store));
-    await tester.pump();
+    await _pumpAndStartGame(tester, store);
 
     final m = tester.getCenter(find.text('М'));
     final a = tester.getCenter(find.text('А'));

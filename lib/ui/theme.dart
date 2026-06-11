@@ -12,8 +12,9 @@ abstract final class AppColors {
   static const Color gold = Color(0xFFF5B62B);
   static const Color goldLight = Color(0xFFFFD75E);
   static const Color goldDark = Color(0xFFD9961A);
+  static const Color goldBorder = Color(0xFFD9961A);
 
-  // Manzara katmanları
+  // Manzara katmanları (vektör çizim renkleri - geriye dönük uyumluluk için korundu)
   static const Color ridgeFar = Color(0xFFA9C6DD);
   static const Color ridgeFarDark = Color(0xFF8FB2CC);
   static const Color snowCap = Color(0xFFF4F9FC);
@@ -27,20 +28,22 @@ abstract final class AppColors {
   static const Color eagle = Color(0xCC2B3A45);
 
   // Metin ve kartlar
-  static const Color ink = Color(0xFF232A33);
-  static const Color cardWhite = Color(0xD9FFFFFF); // ~%85 beyaz
-  static const Color cellEmpty = Color(0xCCFFFFFF);
-  static const Color wheelDisc = Color(0x59FFFFFF); // yarı şeffaf çark zemini
-  static const Color barButton = Color(0x59FFFFFF);
-  static const Color barButtonHover = Color(0x8CFFFFFF);
-  static const Color darkPill = Color(0x4D1E2B33); // başlık/bilgi/coin zemini
+  static const Color ink = Color(0xFF122C3D); // Navy / koyu lacivert metin
+  static const Color cardWhite = Color(0xD9FFFFFF);
+  static const Color cellEmpty = Color(0x801E2B33); // Şeffaf koyu gri-mavi boş hücre
+  static const Color wheelDisc = Color(0xFFF2EAD8); // Krem rengi çark zemini
+  static const Color wheelBorder = Color(0xFFE5D5BA); // Çark kenar rengi
+  static const Color barButton = Color(0xFFFBF6EB); // Krem rengi buton arka planı
+  static const Color barButtonBorder = Color(0xFFE9DCC4); // Krem buton kenar rengi
+  static const Color barButtonHover = Color(0xFFF5EAD2);
+  static const Color darkPill = Color(0xFF1E2B33); // Seviye rozet/bilgi zemini
 }
 
 ThemeData buildTheme() => ThemeData(
       useMaterial3: true,
       fontFamily: 'NotoSans',
       colorScheme: ColorScheme.fromSeed(seedColor: AppColors.gold),
-      scaffoldBackgroundColor: AppColors.skyBottom,
+      scaffoldBackgroundColor: const Color(0xFFE4EFF5),
     );
 
 /// Okunabilirlik için yumuşak metin gölgesi.
