@@ -1,0 +1,27 @@
+[
+  {
+    "id": 1,
+    "letters": ["м", "а", "л", "х"],
+    "words": [
+      { "word": "малх", "row": 0, "col": 0, "dir": "across" },
+      { "word": "лам", "row": 0, "col": 2, "dir": "down" },
+      { "word": "мах", "row": 2, "col": 2, "dir": "across" }
+    ]
+  },
+  {
+    "id": 2,
+    "letters": ["к", "о", "р", "т", "а"],
+    "words": [
+      { "word": "корта", "row": 0, "col": 0, "dir": "across" },
+      { "word": "кор", "row": 0, "col": 0, "dir": "down" }
+    ]
+  },
+  {
+    "id": 3,
+    "letters": ["д", "а", "д", "а"],
+    "words": [
+      { "word": "дада", "row": 0, "col": 0, "dir": "across" },
+      { "word": "да", "row": 0, "col": 2, "dir": "down" }
+    ]
+  }
+]
