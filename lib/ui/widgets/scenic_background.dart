@@ -5,7 +5,14 @@ import 'package:flutter/material.dart';
 /// Üst yarıda net dağ ve kule manzarası, alt yarıda ise eğimli bir beyaz sınırla
 /// ayrılmış, bulanıklaştırılmış (blur) ve gölgeli oyun alanı bulunur.
 class ScenicBackground extends StatelessWidget {
-  const ScenicBackground({super.key});
+  const ScenicBackground({
+    super.key,
+    this.showPlayArea = true,
+  });
+
+  /// Oyun ekranındaki okunabilir alan için kullanılan alt blur katmanı.
+  /// Ana sayfada fotoğrafın tamamı net görünsün diye kapatılır.
+  final bool showPlayArea;
 
   @override
   Widget build(BuildContext context) {
@@ -13,33 +20,48 @@ class ScenicBackground extends StatelessWidget {
       fit: StackFit.expand,
       children: [
         // 1. Net Arka Plan Görseli (Tüm ekrana yayılır)
+        // FilterQuality.high: 4K/yüksek DPI ekranlarda ölçekleme kalitesi.
         Image.asset(
           'assets/backgrounds/caucasus.png',
           fit: BoxFit.cover,
           alignment: const Alignment(0, -0.3), // Kuleleri ve zirveleri ortalar
-        ),
-
-        // 2. Alt Eğimli Bölüm (Bulanık ve gölgeli alan)
-        Positioned.fill(
-          child: ClipPath(
-            clipper: const _CurveSeparatorClipper(),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 9, sigmaY: 9),
-              child: Container(
-                // Ekran görüntüsündeki yumuşak krem rengi yarı şeffaf katman
-                color: const Color(0x33FBF6EB),
+          filterQuality: FilterQuality.high,
+          isAntiAlias: true,
+          errorBuilder: (context, error, stackTrace) => const DecoratedBox(
+            // Görsel yüklenemezse oyun krem-mavi gradyanla ayakta kalır.
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Color(0xFF79B8E6), Color(0xFFE4EFF5)],
               ),
             ),
           ),
         ),
 
-        // 3. Eğim Sınırı Üzerindeki Beyaz Kalın Kontur ve Yumuşak Gölge
-        const Positioned.fill(
-          child: CustomPaint(
-            painter: _CurveSeparatorPainter(),
-            size: Size.infinite,
+        if (showPlayArea) ...[
+          // 2. Alt Eğimli Bölüm (Bulanık ve gölgeli alan)
+          Positioned.fill(
+            child: ClipPath(
+              clipper: const _CurveSeparatorClipper(),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 9, sigmaY: 9),
+                child: Container(
+                  // Ekran görüntüsündeki yumuşak krem rengi yarı şeffaf katman
+                  color: const Color(0x33FBF6EB),
+                ),
+              ),
+            ),
           ),
-        ),
+
+          // 3. Eğim Sınırı Üzerindeki Beyaz Kalın Kontur ve Yumuşak Gölge
+          const Positioned.fill(
+            child: CustomPaint(
+              painter: _CurveSeparatorPainter(),
+              size: Size.infinite,
+            ),
+          ),
+        ],
       ],
     );
   }
@@ -81,7 +103,7 @@ class _CurveSeparatorPainter extends CustomPainter {
 
     // 1. Yumuşak Alt Gölgelendirme (Derinlik efekti)
     final shadowPaint = Paint()
-      ..color = Colors.black.withOpacity(0.12)
+      ..color = Colors.black.withValues(alpha: 0.12)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 6.0
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3.0);

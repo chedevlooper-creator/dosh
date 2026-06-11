@@ -60,8 +60,13 @@ class PlacedWord {
 
 /// Bir bölüm: çark harfleri + yerleştirilmiş kelimeler.
 class Level {
-  Level({required this.id, required List<String> letters, required this.words})
-      : letters = [for (final l in letters) normalize(l)];
+  Level({
+    required this.id,
+    required List<String> letters,
+    required this.words,
+    List<String> bonusWords = const [],
+  })  : letters = [for (final l in letters) normalize(l)],
+        bonusWords = {for (final w in bonusWords) normalize(w)};
 
   final int id;
 
@@ -70,8 +75,16 @@ class Level {
 
   final List<PlacedWord> words;
 
+  /// Izgarada yer almayan ama çarktan kurulabilen geçerli kelimeler.
+  /// İçerik kuralı: yalnızca gerçek Çeçence kelimeler eklenir.
+  final Set<String> bonusWords;
+
   /// Hücre → hedef grafem. Kesişim çakışmalarında hata fırlatır.
   late final Map<Cell, String> targetByCell = _buildTargets();
+
+  /// Aynı kelime ızgaraya birden fazla kez yerleşebilir (ör. дош×2);
+  /// oyun tamamlanması benzersiz kelime sayısı üzerinden ölçülür.
+  late final int distinctWordCount = words.map((w) => w.word).toSet().length;
 
   late final int minRow = targetByCell.keys.map((c) => c.row).reduce(min);
   late final int maxRow = targetByCell.keys.map((c) => c.row).reduce(max);
@@ -121,6 +134,26 @@ class Level {
         }
       }
     }
+    for (final bonus in bonusWords) {
+      final graphemes = splitGraphemes(bonus);
+      if (graphemes.length < 2) {
+        throw StateError('Seviye $id: bonus "$bonus" çok kısa');
+      }
+      if (texts.contains(bonus)) {
+        throw StateError(
+          'Seviye $id: bonus "$bonus" zaten ızgara kelimesi',
+        );
+      }
+      final pool = List<String>.from(letters);
+      for (final grapheme in graphemes) {
+        if (!pool.remove(grapheme)) {
+          throw StateError(
+            'Seviye $id: bonus "$bonus" çark harflerinden kurulamıyor '
+            '(eksik: "$grapheme")',
+          );
+        }
+      }
+    }
   }
 
   factory Level.fromJson(Map<String, dynamic> json) => Level(
@@ -129,6 +162,9 @@ class Level {
         words: [
           for (final w in (json['words'] as List))
             PlacedWord.fromJson(w as Map<String, dynamic>),
+        ],
+        bonusWords: [
+          for (final b in (json['bonus'] as List? ?? const [])) b as String,
         ],
       );
 }

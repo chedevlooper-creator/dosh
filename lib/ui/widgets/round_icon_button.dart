@@ -72,29 +72,41 @@ class _RoundIconButtonState extends State<RoundIconButton>
     // (onTap == null) butonlar normal görünür ama tepki vermez.
     final active = widget.enabled && widget.onTap != null;
 
+    // Ana ekrandaki krem buton diliyle aynı; hover'da hafif "kalkma"
+    // (gölge büyür), basınca küçülüp gölge daralır — dokunsal his.
+    final lifted = _hovered && active && !_pressed;
     final button = AnimatedScale(
-      scale: _pressed ? 0.92 : (_hovered && active ? 1.06 : 1.0),
-      duration: const Duration(milliseconds: 110),
+      scale: _pressed ? 0.94 : (lifted ? 1.05 : 1.0),
+      duration: AppMotion.fast,
+      curve: AppMotion.enter,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
+        duration: AppMotion.base,
+        curve: AppMotion.enter,
         width: widget.size,
         height: widget.size,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: _hovered && active
-                ? const [Color(0xCCFFFFFF), Color(0x8CFFFFFF)]
-                : const [Color(0x8CFFFFFF), Color(0x42FFFFFF)],
-          ),
-          border: Border.all(color: const Color(0x80FFFFFF), width: 1.4),
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x33000000),
-              blurRadius: 8,
-              offset: Offset(0, 3),
-            ),
+          color: lifted ? AppColors.barButtonHover : AppColors.barButton,
+          border: Border.all(color: AppColors.barButtonBorder, width: 1.5),
+          boxShadow: [
+            if (_pressed)
+              const BoxShadow(
+                color: Color(0x1F000000),
+                blurRadius: 3,
+                offset: Offset(0, 1),
+              )
+            else if (lifted)
+              const BoxShadow(
+                color: Color(0x33000000),
+                blurRadius: 14,
+                offset: Offset(0, 6),
+              )
+            else
+              const BoxShadow(
+                color: Color(0x1F000000),
+                blurRadius: 6,
+                offset: Offset(0, 3),
+              ),
           ],
         ),
         child:
@@ -130,17 +142,22 @@ class _RoundIconButtonState extends State<RoundIconButton>
                         ),
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
-                            colors: [AppColors.goldLight, AppColors.gold],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [AppColors.goldLight, AppColors.goldDark],
                           ),
                           borderRadius: BorderRadius.circular(999),
-                          border: Border.all(color: Colors.white, width: 1),
+                          border: Border.all(
+                            color: const Color(0xFFFFF6D8),
+                            width: 1.2,
+                          ),
                         ),
                         child: Text(
                           widget.badge!,
                           style: const TextStyle(
                             fontSize: 10.5,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.ink,
+                            fontWeight: FontWeight.w900,
+                            color: Colors.white,
                           ),
                         ),
                       ),

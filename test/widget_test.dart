@@ -1,4 +1,5 @@
 import 'package:dosh/app.dart';
+import 'package:dosh/core/strings.dart';
 import 'package:dosh/data/models.dart';
 import 'package:dosh/data/progress_store.dart';
 import 'package:flutter/material.dart';
@@ -23,11 +24,16 @@ Future<ProgressStore> _freshStore() async {
 }
 
 Future<void> _pumpAndStartGame(WidgetTester tester, ProgressStore store) async {
+  // Testte asset yüklenmez; ana ekran ve bölüm başlığında gerekli metinleri ver.
+  Strings.testOverride = {
+    'start': 'ДӀадоладе',
+    'level_1': '1',
+  };
   await tester.pumpWidget(DoshApp(levels: [_malxLevel()], store: store));
   await tester.pump();
 
   expect(find.text('Дош'), findsOneWidget);
-  expect(find.text('Başla'), findsOneWidget);
+  expect(find.text('ДӀадоладе'), findsOneWidget);
 
   await tester.tap(find.byKey(const ValueKey('home_play')));
   await tester.pump();
@@ -39,7 +45,7 @@ void main() {
     final store = await _freshStore();
     await _pumpAndStartGame(tester, store);
 
-    expect(find.text('level_1'), findsOneWidget);
+    expect(find.text('1  0/3'), findsOneWidget);
   });
 
   testWidgets('oyun ekranında başlık anahtarı ve çark harfleri görünür',
@@ -47,8 +53,7 @@ void main() {
     final store = await _freshStore();
     await _pumpAndStartGame(tester, store);
 
-    // Çeçence çevirisi olmayan başlık, teknik anahtar olarak görünür.
-    expect(find.text('level_1'), findsOneWidget);
+    expect(find.text('1  0/3'), findsOneWidget);
     expect(find.text('М'), findsOneWidget);
     expect(find.text('А'), findsOneWidget);
     expect(find.text('Л'), findsOneWidget);

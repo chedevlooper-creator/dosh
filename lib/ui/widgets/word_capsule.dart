@@ -113,13 +113,21 @@ class _WordCapsuleState extends State<WordCapsule>
                       gradient: const LinearGradient(
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
-                        colors: [AppColors.goldLight, AppColors.gold],
+                        colors: [
+                          Color(0xFFFFE489),
+                          AppColors.gold,
+                          AppColors.goldDark,
+                        ],
                       ),
                       borderRadius: BorderRadius.circular(26),
+                      border: Border.all(
+                        color: const Color(0xFFFFF6D8),
+                        width: 2,
+                      ),
                       boxShadow: const [
                         BoxShadow(
-                          color: Color(0x59D9961A),
-                          blurRadius: 12,
+                          color: Color(0x40000000),
+                          blurRadius: 10,
                           offset: Offset(0, 4),
                         ),
                       ],
@@ -127,11 +135,12 @@ class _WordCapsuleState extends State<WordCapsule>
                     child: Text(
                       text,
                       style: const TextStyle(
+                        fontFamily: AppText.displayFamily,
+                        fontFamilyFallback: AppText.displayFallback,
                         fontSize: 21,
-                        fontWeight: FontWeight.w800,
+                        fontWeight: FontWeight.bold,
                         letterSpacing: 2.5,
-                        color: Colors.white,
-                        shadows: kSoftTextShadow,
+                        color: AppColors.ink,
                       ),
                     ),
                   ),

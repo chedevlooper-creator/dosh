@@ -14,10 +14,11 @@ flutter run                 # bağlı Android/iOS cihazda
 
 ## İçerik kuralları (önemli)
 
-- **Sahte Çeçence asla yazılmaz.** Kullanıcıya görünen her metin ya gerçek
-  Çeçencedir ya da teknik localization anahtarıdır (`level_1` gibi).
-- `assets/i18n/ce.json` — anahtar → gerçek Çeçence metin. Anahtar yoksa
-  ekranda anahtarın kendisi görünür.
+- **Sahte Çeçence asla yazılmaz.** Bulmaca kelimeleri ve kelime açıklamaları
+  yalnızca doğrulanmış gerçek Çeçencedir.
+- Arayüz metinleri şimdilik Türkçe yer tutucudur (`assets/i18n/ce.json`).
+  Gerçek Çeçence çeviriler hazır olduğunda yalnızca bu dosya güncellenir.
+  Bir anahtarın karşılığı yoksa ekranda anahtarın kendisi görünür.
 - Çözülen kelimenin alt bilgisi `info_<kelime>` anahtarından okunur
   (ör. `info_малх`). Anahtar yoksa alt bilgi şeridi hiç görünmez.
 

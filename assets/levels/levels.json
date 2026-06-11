@@ -35,5 +35,164 @@
       { "word": "дада", "row": 0, "col": 0, "dir": "across" },
       { "word": "да", "row": 0, "col": 2, "dir": "down" }
     ]
+  },
+  {
+    "id": 5,
+    "letters": ["х", "и", "цӏ", "е", "а", "л", "у"],
+    "words": [
+      { "word": "хи", "row": 0, "col": 0, "dir": "across" },
+      { "word": "цӏе", "row": 2, "col": 0, "dir": "across" },
+      { "word": "алу", "row": 4, "col": 1, "dir": "across" }
+    ]
+  },
+  {
+    "id": 6,
+    "letters": ["д", "о", "г", "к", "б", "е", "р"],
+    "words": [
+      { "word": "дог", "row": 0, "col": 0, "dir": "across" },
+      { "word": "ког", "row": 0, "col": 3, "dir": "across" },
+      { "word": "бер", "row": 2, "col": 1, "dir": "across" }
+    ]
+  },
+  {
+    "id": 7,
+    "letters": ["н", "а", "н", "а", "с", "т", "г", "з", "у", "д"],
+    "words": [
+      { "word": "нана", "row": 0, "col": 0, "dir": "across" },
+      { "word": "стаг", "row": 2, "col": 1, "dir": "across" },
+      { "word": "зуда", "row": 4, "col": 2, "dir": "across" }
+    ]
+  },
+  {
+    "id": 8,
+    "letters": ["м", "о", "х", "хь", "у", "н", "хӏ", "а"],
+    "words": [
+      { "word": "мох", "row": 0, "col": 0, "dir": "across" },
+      { "word": "хьун", "row": 1, "col": 3, "dir": "across" },
+      { "word": "хӏоа", "row": 3, "col": 1, "dir": "across" }
+    ]
+  },
+  {
+    "id": 9,
+    "letters": ["с", "о", "хь", "ш", "у", "и", "з", "а"],
+    "words": [
+      { "word": "со", "row": 0, "col": 0, "dir": "across" },
+      { "word": "хьо", "row": 0, "col": 2, "dir": "across" },
+      { "word": "шу", "row": 0, "col": 4, "dir": "down" },
+      { "word": "иза", "row": 2, "col": 0, "dir": "across" }
+    ]
+  },
+  {
+    "id": 10,
+    "letters": ["ц", "хь", "ш", "и", "кх", "о", "у", "а", "д"],
+    "words": [
+      { "word": "ши", "row": 0, "col": 0, "dir": "across" },
+      { "word": "кхо", "row": 0, "col": 2, "dir": "across" },
+      { "word": "ца", "row": 0, "col": 5, "dir": "across" },
+      { "word": "шу", "row": 0, "col": 0, "dir": "down" }
+    ]
+  },
+  {
+    "id": 11,
+    "letters": ["б", "ӏ", "аь", "р", "г", "л", "е", "к", "уь"],
+    "words": [
+      { "word": "бӏаьрг", "row": 0, "col": 0, "dir": "across" },
+      { "word": "лерг", "row": 1, "col": 0, "dir": "across" },
+      { "word": "куьг", "row": 1, "col": 4, "dir": "across" }
+    ]
+  },
+  {
+    "id": 12,
+    "letters": ["н", "а", "н", "а", "м", "й", "р", "б", "е", "к"],
+    "words": [
+      { "word": "нана", "row": 0, "col": 0, "dir": "across" },
+      { "word": "майра", "row": 0, "col": 4, "dir": "across" },
+      { "word": "бер", "row": 1, "col": 1, "dir": "down" }
+    ]
+  },
+  {
+    "id": 13,
+    "letters": ["д", "и", "т", "т", "б", "а", "а", "г", "м", "р", "о", "с"],
+    "words": [
+      { "word": "дитт", "row": 0, "col": 0, "dir": "across" },
+      { "word": "бага", "row": 0, "col": 4, "dir": "across" },
+      { "word": "мара", "row": 1, "col": 1, "dir": "down" },
+      { "word": "мотт", "row": 4, "col": 2, "dir": "across" }
+    ]
+  },
+  {
+    "id": 14,
+    "letters": ["ж", "ж", "и", "и", "м", "а", "а", "а", "л", "г", "гӏ", "ӏ"],
+    "words": [
+      { "word": "жижиг", "row": 0, "col": 0, "dir": "across" },
+      { "word": "мала", "row": 1, "col": 0, "dir": "down" },
+      { "word": "гӏа", "row": 4, "col": 1, "dir": "across" }
+    ]
+  },
+  {
+    "id": 15,
+    "letters": ["м", "а", "р", "х", "а", "с", "е", "д", "о", "гӏ"],
+    "words": [
+      { "word": "седа", "row": 0, "col": 1, "dir": "down" },
+      { "word": "догӏа", "row": 2, "col": 1, "dir": "across" },
+      { "word": "марха", "row": 3, "col": 0, "dir": "across" },
+      { "word": "мох", "row": 5, "col": 0, "dir": "across" }
+    ]
+  },
+  {
+    "id": 16,
+    "letters": ["к", "о", "р", "т", "а", "м", "б", "г", "л", "т", "а"],
+    "words": [
+      { "word": "мара", "row": 0, "col": 2, "dir": "down" },
+      { "word": "мотт", "row": 0, "col": 5, "dir": "down" },
+      { "word": "корта", "row": 2, "col": 0, "dir": "across" },
+      { "word": "бага", "row": 3, "col": 1, "dir": "across" },
+      { "word": "гола", "row": 3, "col": 3, "dir": "down" }
+    ]
+  },
+  {
+    "id": 17,
+    "letters": ["д", "и", "т", "т", "о", "р", "а", "м", "с", "з", "е", "г", "з"],
+    "words": [
+      { "word": "стом", "row": 0, "col": 2, "dir": "down" },
+      { "word": "дитт", "row": 1, "col": 0, "dir": "across" },
+      { "word": "орам", "row": 4, "col": 3, "dir": "down" },
+      { "word": "седа", "row": 5, "col": 1, "dir": "down" },
+      { "word": "зезаг", "row": 6, "col": 0, "dir": "across" }
+    ]
+  },
+  {
+    "id": 18,
+    "letters": ["л", "аь", "хь", "а", "чӏ", "р", "м", "е", "з", "э", "кх", "п", "у", "а"],
+    "words": [
+      { "word": "чӏара", "row": 0, "col": 3, "dir": "down" },
+      { "word": "пхьу", "row": 2, "col": 2, "dir": "down" },
+      { "word": "лаьхьа", "row": 3, "col": 0, "dir": "across" },
+      { "word": "меза", "row": 5, "col": 0, "dir": "across" },
+      { "word": "экха", "row": 6, "col": 2, "dir": "across" }
+    ]
+  },
+  {
+    "id": 19,
+    "letters": ["цӏ", "е", "н", "м", "о", "ж", "а", "к", "й", "в", "ш", "и", "р"],
+    "words": [
+      { "word": "цӏен", "row": 0, "col": 3, "dir": "down" },
+      { "word": "кайн", "row": 2, "col": 0, "dir": "across" },
+      { "word": "шира", "row": 0, "col": 4, "dir": "down" },
+      { "word": "можа", "row": 3, "col": 1, "dir": "across" },
+      { "word": "вон", "row": 5, "col": 0, "dir": "across" }
+    ]
+  },
+  {
+    "id": 20,
+    "letters": ["х", "и", "цӏ", "е", "ч", "м", "гӏ", "у", "о", "л", "а"],
+    "words": [
+      { "word": "лам", "row": 0, "col": 2, "dir": "down" },
+      { "word": "хи", "row": 1, "col": 1, "dir": "down" },
+      { "word": "чим", "row": 2, "col": 0, "dir": "across" },
+      { "word": "мох", "row": 2, "col": 2, "dir": "down" },
+      { "word": "гӏум", "row": 5, "col": 0, "dir": "across" },
+      { "word": "цӏе", "row": 5, "col": 3, "dir": "across" }
+    ]
   }
 ]

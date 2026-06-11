@@ -117,7 +117,7 @@ class _LetterCellState extends State<_LetterCell>
     super.initState();
     _pop = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 380),
+      duration: AppMotion.pop,
     );
     if (widget.show) _pop.value = 1; // yeniden kurulumda animasyon tekrarı yok
   }
@@ -144,7 +144,7 @@ class _LetterCellState extends State<_LetterCell>
     final solved = widget.solved;
 
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 260),
+      duration: AppMotion.base,
       width: widget.size,
       height: widget.size,
       decoration: BoxDecoration(
@@ -157,6 +157,10 @@ class _LetterCellState extends State<_LetterCell>
               )
             : null,
         color: visible && solved ? null : AppColors.cellEmpty,
+        // İnce ışık konturu: hücreleri yoğun fotoğraf üzerinde tanımlar.
+        border: visible && solved
+            ? null
+            : Border.all(color: const Color(0x2EFFFFFF), width: 1),
         boxShadow: [
           if (visible && solved)
             const BoxShadow(
@@ -197,9 +201,10 @@ class _LetterCellState extends State<_LetterCell>
                               style: TextStyle(
                                 fontSize: widget.size * 0.55,
                                 fontWeight: FontWeight.w900,
+                                // İpucu harfi koyu hücre üzerinde parlak altın
                                 color: solved
                                     ? AppColors.ink
-                                    : AppColors.goldDark,
+                                    : AppColors.goldLight,
                               ),
                             ),
                           ),

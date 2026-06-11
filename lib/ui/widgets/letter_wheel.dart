@@ -263,7 +263,8 @@ class _BubbleState extends State<_Bubble> {
       onExit: (_) => setState(() => _hovered = false),
       child: AnimatedScale(
         scale: selected ? 1.18 : (_hovered ? 1.08 : 1.0),
-        duration: const Duration(milliseconds: 120),
+        duration: AppMotion.fast,
+        curve: AppMotion.enter,
         child: Container(
           width: r * 2,
           height: r * 2,
@@ -284,7 +285,7 @@ class _BubbleState extends State<_Bubble> {
                   )
                 : null,
             border: selected
-                ? Border.all(color: const Color(0x80FFFFFF), width: 1.5)
+                ? Border.all(color: const Color(0xCCFFF6D8), width: 1.6)
                 : null,
             boxShadow: [
               if (selected)
@@ -296,22 +297,31 @@ class _BubbleState extends State<_Bubble> {
             ],
           ),
           child: Center(
-            child: Text(
-              widget.label,
-              style: TextStyle(
-                fontFamily: 'Georgia',
-                fontSize: r * 0.96,
-                fontWeight: FontWeight.bold,
-                color: selected ? Colors.white : const Color(0xFF122C3D),
-                shadows: selected
-                    ? const [
-                        Shadow(
-                          color: Color(0x59000000),
-                          blurRadius: 4,
-                          offset: Offset(0, 2),
-                        ),
-                      ]
-                    : null,
+            child: Padding(
+              padding: EdgeInsets.all(r * 0.16),
+              // Digraflar (ХЬ, КӀ...) tek karakterden geniştir; scaleDown
+              // yalnızca sığmayanı küçültür, tek harfleri büyütmez.
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  widget.label,
+                  style: TextStyle(
+                    fontFamily: AppText.displayFamily,
+                    fontFamilyFallback: AppText.displayFallback,
+                    fontSize: r * 0.96,
+                    fontWeight: FontWeight.bold,
+                    color: selected ? Colors.white : AppColors.ink,
+                    shadows: selected
+                        ? const [
+                            Shadow(
+                              color: Color(0x59000000),
+                              blurRadius: 4,
+                              offset: Offset(0, 2),
+                            ),
+                          ]
+                        : null,
+                  ),
+                ),
               ),
             ),
           ),

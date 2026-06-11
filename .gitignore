@@ -43,3 +43,9 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Yerel doğrulama logları ve görsel doğrulama çıktıları
+setup_log.txt
+test_log.txt
+git_log.txt
+test/goldens/

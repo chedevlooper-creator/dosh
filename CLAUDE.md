@@ -153,9 +153,6 @@ Edit `assets/levels/levels.json`. Each level:
 - Add real Chechen for the level title (`level_<id>`) and any `info_<word>`
   footnotes in `assets/i18n/ce.json`; omit if you don't have a real source.
 
-> Note: `home_screen.dart`'s `_MiniGrid` has a hardcoded solved-cell preview for
-> `level.id == 1` to match the reference design; other levels fall back to
-> showing the first word. Keep this in mind if you renumber level 1.
 
 ## Conventions & gotchas
 
