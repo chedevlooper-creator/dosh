@@ -3,9 +3,11 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 
-import '../core/constants.dart';
+import '../core/scoring.dart';
 import '../data/models.dart';
 import '../data/progress_store.dart';
+
+const _persistDebounce = Duration(milliseconds: 800);
 
 /// Tek seferlik görsel efektleri tetikleyen oyun olayları.
 sealed class GameEvent {}
@@ -46,10 +48,19 @@ class LevelCompleted extends GameEvent {}
 
 /// Oyun durumu ve kuralları: seçim, doğrulama, ödül, ipucu, karıştırma.
 class GameController extends ChangeNotifier {
-  GameController({required this.levels, required this.store, Random? random})
-      : _random = random ?? Random() {
-    _levelIndex = store.levelIndex % levels.length;
+  GameController({
+    required this.levels,
+    required this.store,
+    Random? random,
+    int startIndex = -1,
+  }) : _random = random ?? Random() {
+    // startIndex >= 0 ise galeriden gelen seçim, aksi store.levelIndex.
+    _levelIndex = (startIndex >= 0
+            ? startIndex
+            : store.levelIndex % levels.length) %
+        levels.length;
     _coins = store.coins;
+    coinsListenable.value = _coins;
     _initLevel();
   }
 
@@ -69,11 +80,24 @@ class GameController extends ChangeNotifier {
   int _mistakes = 0;
   int _hintsUsed = 0;
 
+  // Granular ValueNotifier'lar: UI'ın sadece ilgili alan değişiminde
+  // rebuild olması için. Mevcut ChangeNotifier uyumluluğu korunur (yine
+  // notifyListeners() tüm state'ler için çağrılıyor); bu notifier'lar
+  // UI tarafında seçici dinleme için kullanılacak.
+  final ValueNotifier<int> coinsListenable = ValueNotifier<int>(0);
+  final ValueNotifier<int> streakListenable = ValueNotifier<int>(0);
+  final ValueNotifier<List<int>> selectionListenable =
+      ValueNotifier<List<int>>(const []);
+  final ValueNotifier<PlacedWord?> lastSolvedListenable =
+      ValueNotifier<PlacedWord?>(null);
+
   final Set<String> solvedWords = {};
   final Set<Cell> revealedCells = {};
 
   /// Bu seviyede bulunan bonus kelimeler (tekrar ödül verilmez).
   final Set<String> foundBonusWords = {};
+
+  Timer? _persistTimer;
 
   /// Aktif seçim: `level.letters` indeksleri (çarktaki baloncuklar).
   final List<int> selection = [];
@@ -93,11 +117,8 @@ class GameController extends ChangeNotifier {
   int get hintsUsed => _hintsUsed;
 
   /// Bölüm sonu yıldız skoru: temiz oyun 3, az hata/ipucu 2, aksi 1.
-  int get performanceStars {
-    if (_mistakes == 0 && _hintsUsed == 0) return 3;
-    if (_mistakes <= 2 && _hintsUsed <= 1) return 2;
-    return 1;
-  }
+  int get performanceStars =>
+      Scoring.stars(mistakes: _mistakes, hintsUsed: _hintsUsed);
 
   // Aynı kelime ızgarada birden çok kez yer alabilir; solvedWords bir Set
   // olduğu için karşılaştırma benzersiz kelime sayısıyla yapılmalı.
@@ -106,6 +127,10 @@ class GameController extends ChangeNotifier {
   String get currentWord => selection.map((i) => level.letters[i]).join();
 
   void _initLevel() {
+    // Yeni seviyeye geçerken eski persist zamanlayıcısı beklemede olabilir;
+    // iptal et ki eski seviyenin üzerine yazma veya yarış koşulu olmasın.
+    _persistTimer?.cancel();
+    _persistTimer = null;
     solvedWords.clear();
     revealedCells.clear();
     foundBonusWords.clear();
@@ -115,6 +140,9 @@ class GameController extends ChangeNotifier {
     _bestStreak = 0;
     _mistakes = 0;
     _hintsUsed = 0;
+    streakListenable.value = 0;
+    selectionListenable.value = const [];
+    lastSolvedListenable.value = null;
     wheelOrder = List.generate(level.letters.length, (i) => i);
     _restoreProgress();
   }
@@ -143,7 +171,13 @@ class GameController extends ChangeNotifier {
     }
   }
 
-  void _persistProgress() {
+  void _schedulePersist() {
+    _persistTimer?.cancel();
+    _persistTimer = Timer(_persistDebounce, _flushPersist);
+  }
+
+  void _flushPersist() {
+    _persistTimer = null;
     unawaited(store.setSolvedWordsFor(level.id, solvedWords));
     unawaited(store.setRevealedCellsFor(level.id, revealedCells));
     unawaited(store.setBonusWordsFor(level.id, foundBonusWords));
@@ -162,25 +196,25 @@ class GameController extends ChangeNotifier {
 
   /// Parmak/imleç bir baloncuğun üzerine geldiğinde.
   /// Sondan bir önceki baloncuğa geri dönüş son seçimi geri alır.
-  void enterBubble(int letterIndex) {
-    if (levelDone) return;
+  /// Seçim değiştiyse `true`, aksi halde `false` döner (UI ses/haptic için).
+  bool enterBubble(int letterIndex) {
+    if (levelDone) return false;
     assert(letterIndex >= 0 && letterIndex < level.letters.length);
     if (selection.isEmpty) {
       selection.add(letterIndex);
-      notifyListeners();
-      return;
-    }
-    if (selection.last == letterIndex) return;
-    if (selection.length >= 2 &&
+    } else if (selection.last == letterIndex) {
+      return false;
+    } else if (selection.length >= 2 &&
         selection[selection.length - 2] == letterIndex) {
       selection.removeLast();
-      notifyListeners();
-      return;
-    }
-    if (!selection.contains(letterIndex)) {
+    } else if (!selection.contains(letterIndex)) {
       selection.add(letterIndex);
-      notifyListeners();
+    } else {
+      return false;
     }
+    selectionListenable.value = List<int>.unmodifiable(selection);
+    notifyListeners();
+    return true;
   }
 
   /// Parmak/imleç bırakıldığında seçimi değerlendirir.
@@ -189,6 +223,7 @@ class GameController extends ChangeNotifier {
     final count = selection.length;
     final word = currentWord;
     selection.clear();
+    selectionListenable.value = const [];
     notifyListeners();
     if (count < 2) return;
     _submit(word);
@@ -196,7 +231,8 @@ class GameController extends ChangeNotifier {
 
   void _submit(String word) {
     if (solvedWords.contains(word) || foundBonusWords.contains(word)) {
-      _registerMiss();
+      // Tekrar girilen kelime hata sayılmaz — kullanıcı yanlış yapmadı,
+      // sadece hatırlıyor. Görsel geri bildirim yeterli.
       _events.add(AlreadyFound());
       return;
     }
@@ -222,11 +258,13 @@ class GameController extends ChangeNotifier {
   /// Izgara dışı geçerli kelime: küçük sabit ödül, ızgara değişmez.
   void _foundBonus(String word) {
     foundBonusWords.add(word);
-    _persistProgress();
-    _coins += GameConfig.bonusWordCoins;
+    _schedulePersist();
+    final reward = Scoring.bonusWord();
+    _coins += reward;
+    coinsListenable.value = _coins;
     unawaited(store.setCoins(_coins));
     _events.add(BonusWordFound(word));
-    _events.add(CoinsGained(GameConfig.bonusWordCoins));
+    _events.add(CoinsGained(reward));
     notifyListeners();
   }
 
@@ -234,44 +272,67 @@ class GameController extends ChangeNotifier {
     _mistakes++;
     final changed = _streak != 0;
     _streak = 0;
-    if (changed) notifyListeners();
+    if (changed) {
+      streakListenable.value = 0;
+      notifyListeners();
+    }
   }
 
   void _solve(PlacedWord word, {required bool byHint}) {
     solvedWords.add(word.word);
     lastSolved = word;
-    var coinGain = 0;
-    var comboGain = 0;
+    lastSolvedListenable.value = word;
     if (byHint) {
       _streak = 0;
     } else {
       _streak++;
       _bestStreak = max(_bestStreak, _streak);
-      coinGain = word.graphemes.length * GameConfig.coinsPerGrapheme;
-      if (_streak % GameConfig.comboMilestone == 0) {
-        comboGain = GameConfig.comboBonusCoins;
-      }
     }
+    streakListenable.value = _streak;
+    final reward = Scoring.forWordSolve(word, byHint: byHint, newStreak: _streak);
     _events.add(WordSolved(word, byHint: byHint));
-    if (coinGain > 0 || comboGain > 0) {
-      final totalGain = coinGain + comboGain;
-      _coins += totalGain;
+    if (reward.total > 0) {
+      _coins += reward.total;
+      coinsListenable.value = _coins;
       unawaited(store.setCoins(_coins));
-      if (comboGain > 0) {
-        _events.add(ComboBonus(streak: _streak, amount: comboGain));
+      if (reward.comboGain > 0) {
+        _events.add(ComboBonus(streak: _streak, amount: reward.comboGain));
       }
-      _events.add(CoinsGained(totalGain));
+      _events.add(CoinsGained(reward.total));
     }
     notifyListeners();
     if (levelDone) {
-      // Panelde çıkılsa bile yeniden açılışta sonraki seviyeden devam etmek
-      // için kalıcı durum tamamlanma anında ilerletilir; bellekteki seviye
-      // oyuncu "Devam" diyene kadar değişmez.
-      unawaited(store.clearLevelProgress(level.id));
-      unawaited(store.setLevelIndex((_levelIndex + 1) % levels.length));
-      _events.add(LevelCompleted());
+      // Fire-and-forget: UI tarafı event'i dinler, persist yazımı sıralıdır.
+      unawaited(_onLevelCompleted());
     } else {
-      _persistProgress();
+      _schedulePersist();
+    }
+  }
+
+  /// Seviye tamamlanma anı: bekleyen persist zamanlayıcısı varsa iptal et,
+  /// son durumu sıralı (setSolved → setRevealed → setBonus → clear → setIndex)
+  /// yaz ve `LevelCompleted` event'ini tetikle. Sıralama önemli: clearProgress
+  /// setLevelIndex'ten önce olmalı, yoksa motor yarış durumu yaratabilir.
+  Future<void> _onLevelCompleted() async {
+    _persistTimer?.cancel();
+    _persistTimer = null;
+    try {
+      await store.setSolvedWordsFor(level.id, solvedWords);
+      await store.setRevealedCellsFor(level.id, revealedCells);
+      await store.setBonusWordsFor(level.id, foundBonusWords);
+      // Galeri için yıldız performansını kaydet (sadece daha iyiyse günceller).
+      await store.setStarsFor(level.id, performanceStars);
+      await store.clearLevelProgress(level.id);
+      await store.setLevelIndex((_levelIndex + 1) % levels.length);
+      // Tüm zamanların en iyi serisini güncelle
+      await store.setBestStreak(_bestStreak);
+    } catch (e, st) {
+      debugPrint('Seviye tamamlama yazması başarısız: $e\n$st');
+    }
+    // dispose() ile _events kapatılmış olabilir; kapalı controller'a add
+    // exception atar, sadece hâlâ açıksa gönder.
+    if (!_events.isClosed) {
+      _events.add(LevelCompleted());
     }
   }
 
@@ -288,7 +349,7 @@ class GameController extends ChangeNotifier {
 
   bool get canHint =>
       !levelDone &&
-      _coins >= GameConfig.hintCost &&
+      _coins >= Scoring.hintCost() &&
       _hintCandidates().isNotEmpty;
 
   /// Coin karşılığı rastgele bir hücreyi açar; ipucuyla tamamen dolan
@@ -300,7 +361,9 @@ class GameController extends ChangeNotifier {
     revealedCells.add(cell);
     _hintsUsed++;
     _streak = 0;
-    _coins -= GameConfig.hintCost;
+    streakListenable.value = 0;
+    _coins -= Scoring.hintCost();
+    coinsListenable.value = _coins;
     unawaited(store.setCoins(_coins));
     _events.add(HintRevealed(cell));
     for (final word in level.words) {
@@ -308,7 +371,7 @@ class GameController extends ChangeNotifier {
         _solve(word, byHint: true);
       }
     }
-    if (!levelDone) _persistProgress();
+    if (!levelDone) _schedulePersist();
     notifyListeners();
   }
 
@@ -333,6 +396,17 @@ class GameController extends ChangeNotifier {
 
   @override
   void dispose() {
+    // Kapanışta bekleyen persist varsa yaz — uygulama GC'lenirken veri kaybı
+    // olmasın. Async setXxx zaten fire-and-forget, dispose sonrası motorun
+    // dispose'ı bekleyebilir.
+    if (_persistTimer != null) {
+      _persistTimer!.cancel();
+      _flushPersist();
+    }
+    coinsListenable.dispose();
+    streakListenable.dispose();
+    selectionListenable.dispose();
+    lastSolvedListenable.dispose();
     _events.close();
     super.dispose();
   }

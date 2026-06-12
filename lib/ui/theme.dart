@@ -66,6 +66,20 @@ abstract final class AppMotion {
   static const Curve popCurve = Curves.easeOutBack;
 }
 
+/// Sistem "azaltılmış hareket" tercihini kontrol eden tek nokta.
+/// `MediaQuery.disableAnimationsOf(context)` ile birlikte kullanılır;
+/// animasyon yapan widget'lar bunu okuyup süreleri 0'a indirir.
+abstract final class MotionSettings {
+  /// Build context'ten: kullanıcı sistem ayarı olarak "azaltılmış hareket"
+  /// isteyse true. Animasyon yapan widget'lar bu bayrakla süreleri 0'a çeker.
+  static bool reduced(BuildContext context) =>
+      MediaQuery.disableAnimationsOf(context);
+
+  /// Animasyon süresini reduced modda 0 yapar, aksi normal süre.
+  static Duration duration(BuildContext context, Duration normal) =>
+      reduced(context) ? Duration.zero : normal;
+}
+
 ThemeData buildTheme() => ThemeData(
       useMaterial3: true,
       fontFamily: 'NotoSans',

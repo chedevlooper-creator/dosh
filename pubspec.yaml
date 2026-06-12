@@ -1,7 +1,7 @@
 name: dosh
 description: "Çeçence kelime bulmaca oyunu (Дош)."
 publish_to: 'none'
-version: 0.1.0
+version: 1.0.0
 
 environment:
   sdk: ^3.5.0
@@ -16,6 +16,8 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
+  flutter_launcher_icons: ^0.14.4
+  flutter_native_splash: ^2.4.8
 
 flutter:
   uses-material-design: true
@@ -24,7 +26,7 @@ flutter:
     - assets/i18n/
     - assets/levels/
     - assets/audio/
-    - assets/backgrounds/
+    - assets/fonts/
 
   fonts:
     - family: NotoSans
@@ -32,3 +34,26 @@ flutter:
         - asset: assets/fonts/NotoSans-Regular.ttf
         - asset: assets/fonts/NotoSans-Bold.ttf
           weight: 700
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon/icon_raw.png"
+  remove_alpha_ios: true
+  adaptive_icon_background: "#F5B62B"
+  adaptive_icon_foreground: "assets/icon/icon_raw.png"
+  web:
+    generate: true
+    image_path: "assets/icon/icon_raw.png"
+  windows:
+    generate: true
+    image_path: "assets/icon/icon_raw.png"
+    icon_size: 256
+
+flutter_native_splash:
+  color: "#F5B62B"
+  image: "assets/icon/icon_raw.png"
+  android: true
+  ios: true
+  web: false
+  fullscreen: true

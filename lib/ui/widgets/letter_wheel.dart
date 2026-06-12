@@ -50,7 +50,10 @@ class _LetterWheelState extends State<LetterWheel>
   late List<double> _fromAngles;
   late List<double> _toAngles;
 
-  Offset? _pointer;
+  // Parmak konumunu sürükleme sırasında sadece seçim çizgisinin yeniden
+  // boyanmasını tetiklemek için izole bir notifier kullanıyoruz; böylece
+  // baloncuklar ve şekiller gereksiz yere yeniden inşa edilmiyor.
+  final ValueNotifier<Offset?> _pointer = ValueNotifier<Offset?>(null);
   bool _dragging = false;
 
   @override
@@ -137,6 +140,7 @@ class _LetterWheelState extends State<LetterWheel>
   @override
   void dispose() {
     _shuffleCtrl.dispose();
+    _pointer.dispose();
     super.dispose();
   }
 
@@ -149,13 +153,13 @@ class _LetterWheelState extends State<LetterWheel>
         behavior: HitTestBehavior.opaque,
         onPointerDown: (event) {
           if (!widget.enabled) return;
-          _dragging = true;
-          setState(() => _pointer = event.localPosition);
+          setState(() => _dragging = true);
+          _pointer.value = event.localPosition;
           _hitTest(event.localPosition, _positions(_currentAngles()));
         },
         onPointerMove: (event) {
           if (!_dragging) return;
-          setState(() => _pointer = event.localPosition);
+          _pointer.value = event.localPosition;
           _hitTest(event.localPosition, _positions(_currentAngles()));
         },
         onPointerUp: (_) => _endDrag(),
@@ -196,21 +200,31 @@ class _LetterWheelState extends State<LetterWheel>
                 const Positioned.fill(
                   child: CustomPaint(painter: _OrnamentPainter()),
                 ),
-                // Seçim çizgisi (baloncukların altında)
+                // Seçim çizgisi (baloncukların altında) — sürükleme sırasında
+                // parmak konumu yalnızca bu katmanı yeniden boyar; baloncuklar
+                // ve diğer katmanlar etkilenmez.
                 Positioned.fill(
-                  child: CustomPaint(
-                    painter: _SelectionLinePainter(
-                      points: selectedPoints,
-                      pointer: _dragging && widget.selection.isNotEmpty
-                          ? _pointer
-                          : null,
-                      strokeWidth:
-                          (bubbleR * 0.55).clamp(10.0, 18.0).toDouble(),
+                  child: RepaintBoundary(
+                    child: ValueListenableBuilder<Offset?>(
+                      valueListenable: _pointer,
+                      builder: (context, pointer, _) {
+                        return CustomPaint(
+                          painter: _SelectionLinePainter(
+                            points: selectedPoints,
+                            pointer: _dragging && widget.selection.isNotEmpty
+                                ? pointer
+                                : null,
+                            strokeWidth:
+                                (bubbleR * 0.55).clamp(10.0, 18.0).toDouble(),
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ),
                 for (var i = 0; i < widget.letters.length; i++)
                   Positioned(
+                    key: ValueKey('bubble_$i'),
                     left: positions[i].dx - bubbleR,
                     top: positions[i].dy - bubbleR,
                     child: _Bubble(
@@ -229,8 +243,8 @@ class _LetterWheelState extends State<LetterWheel>
 
   void _endDrag() {
     if (!_dragging) return;
-    _dragging = false;
-    setState(() => _pointer = null);
+    setState(() => _dragging = false);
+    _pointer.value = null;
     widget.onRelease();
   }
 }
@@ -258,10 +272,13 @@ class _BubbleState extends State<_Bubble> {
     final r = widget.radius;
     final selected = widget.selected;
 
-    return MouseRegion(
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
-      child: AnimatedScale(
+    return Semantics(
+      label: 'Harf ${widget.label}${widget.selected ? ", seçili" : ""}',
+      button: true,
+      child: MouseRegion(
+        onEnter: (_) => setState(() => _hovered = true),
+        onExit: (_) => setState(() => _hovered = false),
+        child: AnimatedScale(
         scale: selected ? 1.18 : (_hovered ? 1.08 : 1.0),
         duration: AppMotion.fast,
         curve: AppMotion.enter,
@@ -326,6 +343,7 @@ class _BubbleState extends State<_Bubble> {
             ),
           ),
         ),
+      ),
       ),
     );
   }

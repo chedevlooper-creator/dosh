@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Дош — Çeçence Kelime Bulmaca Oyunu</title>
+<meta name="description" content="Дош: harf çarkı + bulmaca ızgarasıyla Çeçence öğreten, tamamen ücretsiz kelime oyunu. Android, iOS ve Windows.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Prata&family=Golos+Text:wght@400;500;600&family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --night-0: #060a16;
+    --night-1: #0b1124;
+    --night-2: #121a35;
+    --night-3: #1a2447;
+    --gold: #f5b62b;
+    --gold-soft: #ffd76e;
+    --gold-dim: rgba(245, 182, 43, .14);
+    --cream: #f4ead8;
+    --muted: #8d96b8;
+    --line: rgba(244, 234, 216, .1);
+    --serif: 'Prata', 'Noto Sans', serif;
+    --sans: 'Golos Text', 'Noto Sans', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--night-0);
+    color: var(--cream);
+    font-family: var(--sans);
+    font-size: 17px;
+    line-height: 1.65;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection { background: var(--gold); color: var(--night-0); }
+
+  /* ---- grain overlay ---- */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    pointer-events: none;
+    opacity: .045;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .wrap { max-width: 1160px; margin: 0 auto; padding: 0 clamp(20px, 4vw, 48px); }
+
+  /* ================= header ================= */
+  header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    backdrop-filter: blur(14px);
+    background: rgba(6, 10, 22, .55);
+    border-bottom: 1px solid transparent;
+    transition: border-color .4s;
+  }
+  header.scrolled { border-bottom-color: var(--line); }
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 68px;
+  }
+  .brand {
+    font-family: var(--serif);
+    font-size: 26px;
+    color: var(--cream);
+    text-decoration: none;
+    letter-spacing: .02em;
+  }
+  .brand b { color: var(--gold); font-weight: 400; }
+  .nav-links { display: flex; gap: 34px; align-items: center; }
+  .nav-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 14px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    transition: color .25s;
+  }
+  .nav-links a:hover { color: var(--cream); }
+  .nav-cta {
+    color: var(--night-0) !important;
+    background: var(--gold);
+    padding: 9px 20px;
+    border-radius: 999px;
+    font-weight: 600;
+  }
+  .nav-cta:hover { background: var(--gold-soft); color: var(--night-0) !important; }
+  @media (max-width: 720px) { .nav-links a:not(.nav-cta) { display: none; } }
+
+  /* ================= hero ================= */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: 130px 0 220px;
+    background:
+      radial-gradient(1100px 600px at 75% -10%, var(--night-3), transparent 65%),
+      linear-gradient(180deg, var(--night-1) 0%, var(--night-0) 100%);
+  }
+  .stars { position: absolute; inset: 0; overflow: hidden; }
+  .star {
+    position: absolute;
+    width: 2px; height: 2px;
+    border-radius: 50%;
+    background: var(--cream);
+    animation: twinkle 4s ease-in-out infinite;
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: .15; }
+    50% { opacity: .8; }
+  }
+
+  .hero-grid {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: 1.05fr .95fr;
+    gap: clamp(32px, 5vw, 72px);
+    align-items: center;
+    width: 100%;
+  }
+  @media (max-width: 880px) {
+    .hero { padding-bottom: 260px; }
+    .hero-grid { grid-template-columns: 1fr; }
+  }
+
+  .kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+  .kicker::before {
+    content: '';
+    width: 34px; height: 1px;
+    background: var(--gold);
+  }
+
+  h1 {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: clamp(64px, 9vw, 124px);
+    line-height: .98;
+    margin: 22px 0 8px;
+  }
+  h1 .word-mark { color: var(--gold); display: block; }
+  h1 .sub-mark {
+    display: block;
+    font-size: clamp(26px, 3.2vw, 42px);
+    color: var(--cream);
+    margin-top: 14px;
+  }
+
+  .hero-copy {
+    color: var(--muted);
+    max-width: 46ch;
+    margin: 22px 0 36px;
+    font-size: 18px;
+  }
+  .hero-copy strong { color: var(--cream); font-weight: 500; }
+
+  .cta-row { display: flex; gap: 14px; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 28px;
+    border-radius: 999px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 15px;
+    transition: transform .25s, box-shadow .25s, background .25s;
+  }
+  .btn-gold {
+    background: var(--gold);
+    color: var(--night-0);
+    box-shadow: 0 8px 32px rgba(245, 182, 43, .28);
+  }
+  .btn-gold:hover { transform: translateY(-2px); background: var(--gold-soft); }
+  .btn-ghost {
+    color: var(--cream);
+    border: 1px solid var(--line);
+  }
+  .btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+
+  .hero-stats {
+    display: flex;
+    gap: clamp(24px, 4vw, 56px);
+    margin-top: 52px;
+    padding-top: 28px;
+    border-top: 1px solid var(--line);
+  }
+  .stat .n {
+    font-family: var(--serif);
+    font-size: 30px;
+    color: var(--gold);
+  }
+  .stat .l {
+    font-size: 12px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* staggered hero entrance */
+  .rise { opacity: 0; transform: translateY(26px); animation: rise .9s cubic-bezier(.2,.7,.2,1) forwards; }
+  .rise.d1 { animation-delay: .08s; }
+  .rise.d2 { animation-delay: .2s; }
+  .rise.d3 { animation-delay: .34s; }
+  .rise.d4 { animation-delay: .48s; }
+  .rise.d5 { animation-delay: .62s; }
+  @keyframes rise { to { opacity: 1; transform: none; } }
+
+  /* ---- letter wheel ---- */
+  .wheel-zone {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 26px;
+  }
+  .capsule {
+    min-height: 64px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: translateY(10px) scale(.95);
+    transition: opacity .45s, transform .45s cubic-bezier(.2,.9,.3,1.4);
+  }
+  .capsule.show { opacity: 1; transform: none; }
+  .capsule .w {
+    font-family: var(--serif);
+    font-size: 38px;
+    letter-spacing: .12em;
+    color: var(--gold);
+    text-transform: uppercase;
+  }
+  .capsule .m { font-size: 14px; color: var(--muted); letter-spacing: .08em; }
+
+  .wheel {
+    position: relative;
+    width: min(78vw, 360px);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(circle at 38% 30%, rgba(245,182,43,.08), rgba(18,26,53,.55) 65%);
+    border: 1px solid var(--line);
+    box-shadow:
+      0 0 0 14px rgba(245, 182, 43, .035),
+      0 0 90px rgba(245, 182, 43, .1),
+      inset 0 0 60px rgba(6, 10, 22, .6);
+  }
+  .wheel svg.trace {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  .trace line {
+    stroke: var(--gold);
+    stroke-width: 2.4;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 6px rgba(245, 182, 43, .7));
+  }
+  .bubble {
+    position: absolute;
+    width: 17%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translate(-50%, -50%);
+    background: var(--night-2);
+    border: 1px solid var(--line);
+    font-family: var(--serif);
+    font-size: clamp(19px, 2.4vw, 26px);
+    color: var(--cream);
+    text-transform: uppercase;
+    transition: background .3s, color .3s, box-shadow .3s, border-color .3s;
+    user-select: none;
+  }
+  .bubble.active {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--night-0);
+    box-shadow: 0 0 26px rgba(245, 182, 43, .55);
+  }
+
+  /* ---- mountains ---- */
+  .mountains {
+    position: absolute;
+    bottom: -2px; left: 0; right: 0;
+    z-index: 1;
+    pointer-events: none;
+  }
+  .mountains svg { display: block; width: 100%; height: auto; }
+
+  /* ================= sections ================= */
+  section { position: relative; padding: clamp(80px, 11vw, 140px) 0; }
+
+  .sec-kicker {
+    font-size: 13px;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 16px;
+  }
+  h2 {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: clamp(34px, 4.6vw, 56px);
+    line-height: 1.12;
+    max-width: 20ch;
+  }
+  .sec-lead { color: var(--muted); max-width: 56ch; margin-top: 18px; font-size: 18px; }
+
+  /* scroll reveal */
+  .reveal { opacity: 0; transform: translateY(34px); transition: opacity .8s ease, transform .8s cubic-bezier(.2,.7,.2,1); }
+  .reveal.in { opacity: 1; transform: none; }
+
+  /* ---- how it works ---- */
+  .how-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(40px, 6vw, 90px);
+    align-items: center;
+    margin-top: 64px;
+  }
+  @media (max-width: 880px) { .how-grid { grid-template-columns: 1fr; } }
+
+  .steps { display: flex; flex-direction: column; gap: 0; counter-reset: step; }
+  .step {
+    position: relative;
+    padding: 28px 0 28px 76px;
+    border-bottom: 1px solid var(--line);
+    counter-increment: step;
+  }
+  .step:last-child { border-bottom: none; }
+  .step::before {
+    content: '0' counter(step);
+    position: absolute;
+    left: 0; top: 26px;
+    font-family: var(--serif);
+    font-size: 32px;
+    color: var(--gold);
+    opacity: .85;
+  }
+  .step h3 { font-size: 19px; font-weight: 600; margin-bottom: 6px; }
+  .step p { color: var(--muted); font-size: 16px; }
+
+  /* crossword demo */
+  .board {
+    justify-self: center;
+    background: linear-gradient(160deg, var(--night-2), var(--night-1));
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    padding: clamp(26px, 4vw, 46px);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, .45);
+  }
+  .grid-demo {
+    display: grid;
+    grid-template-columns: repeat(4, clamp(52px, 7vw, 68px));
+    grid-auto-rows: clamp(52px, 7vw, 68px);
+    gap: 8px;
+  }
+  .cell {
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--serif);
+    font-size: clamp(22px, 3vw, 28px);
+    text-transform: uppercase;
+  }
+  .cell.slot { background: rgba(244, 234, 216, .06); border: 1px solid var(--line); }
+  .cell.gap { visibility: hidden; }
+  .cell .ltr {
+    opacity: 0;
+    transform: scale(.4);
+    color: var(--night-0);
+  }
+  .board.play .cell.slot { animation: cellGold .5s ease forwards; }
+  .board.play .cell .ltr { animation: pop .5s cubic-bezier(.2,.9,.3,1.5) forwards; }
+  @keyframes cellGold {
+    to { background: var(--gold); border-color: var(--gold); box-shadow: 0 6px 22px rgba(245,182,43,.35); }
+  }
+  @keyframes pop { to { opacity: 1; transform: scale(1); } }
+  .board-caption {
+    margin-top: 22px;
+    text-align: center;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .board-caption b { color: var(--gold); font-weight: 600; }
+
+  /* ---- digraphs band ---- */
+  .digraph-band {
+    background: linear-gradient(180deg, var(--night-1), var(--night-0));
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    overflow: hidden;
+  }
+  .marquee {
+    margin-top: 56px;
+    display: flex;
+    gap: 18px;
+    width: max-content;
+    animation: scroll 36s linear infinite;
+  }
+  .marquee:hover { animation-play-state: paused; }
+  @keyframes scroll { to { transform: translateX(-50%); } }
+  .tile {
+    flex: 0 0 auto;
+    width: 108px;
+    height: 128px;
+    border-radius: 18px;
+    background: var(--night-2);
+    border: 1px solid var(--line);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: transform .3s, border-color .3s, background .3s;
+  }
+  .tile:hover {
+    transform: translateY(-8px) rotate(-2deg);
+    border-color: var(--gold);
+    background: var(--night-3);
+  }
+  .tile .dg {
+    font-family: var(--sans);
+    font-weight: 700;
+    font-size: 34px;
+    color: var(--gold);
+  }
+  .tile .one {
+    font-size: 11px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* ---- features ---- */
+  .feat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-top: 64px;
+  }
+  @media (max-width: 880px) { .feat-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 560px) { .feat-grid { grid-template-columns: 1fr; } }
+  .feat {
+    position: relative;
+    padding: 34px 28px;
+    border-radius: 20px;
+    background: linear-gradient(165deg, var(--night-2), var(--night-1));
+    border: 1px solid var(--line);
+    transition: transform .35s, border-color .35s;
+    overflow: hidden;
+  }
+  .feat::after {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 140px; height: 140px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--gold-dim), transparent 70%);
+    opacity: 0;
+    transition: opacity .4s;
+  }
+  .feat:hover { transform: translateY(-6px); border-color: rgba(245, 182, 43, .4); }
+  .feat:hover::after { opacity: 1; }
+  .feat .ic {
+    width: 46px; height: 46px;
+    border-radius: 12px;
+    background: var(--gold-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  .feat .ic svg { width: 22px; height: 22px; stroke: var(--gold); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .feat h3 { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+  .feat p { color: var(--muted); font-size: 15px; }
+
+  /* ---- mission ---- */
+  .mission {
+    background:
+      radial-gradient(900px 500px at 20% 110%, var(--night-3), transparent 70%),
+      var(--night-1);
+    border-top: 1px solid var(--line);
+  }
+  .mission-inner {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: clamp(28px, 5vw, 70px);
+  }
+  @media (max-width: 720px) { .mission-inner { grid-template-columns: 1fr; } }
+  .mission-mark {
+    font-family: var(--serif);
+    font-size: clamp(90px, 12vw, 170px);
+    line-height: 1;
+    color: var(--gold);
+    opacity: .9;
+  }
+  blockquote {
+    font-family: var(--serif);
+    font-size: clamp(24px, 3.2vw, 38px);
+    line-height: 1.4;
+    max-width: 26ch;
+  }
+  blockquote em { font-style: normal; color: var(--gold); }
+  .mission-note {
+    margin-top: 26px;
+    color: var(--muted);
+    max-width: 52ch;
+    font-size: 16px;
+  }
+
+  /* ---- final cta ---- */
+  .final {
+    text-align: center;
+    padding-bottom: clamp(60px, 8vw, 100px);
+  }
+  .final h2 { margin: 0 auto; }
+  .badges {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 44px;
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 24px;
+    border-radius: 14px;
+    border: 1px solid var(--line);
+    color: var(--cream);
+    text-decoration: none;
+    transition: border-color .3s, transform .3s, background .3s;
+    background: var(--night-1);
+  }
+  .badge:hover { border-color: var(--gold); transform: translateY(-3px); }
+  .badge svg { width: 24px; height: 24px; fill: var(--cream); }
+  .badge .t { text-align: left; line-height: 1.2; }
+  .badge .t small { display: block; font-size: 11px; color: var(--muted); letter-spacing: .06em; }
+  .badge .t span { font-size: 15px; font-weight: 600; }
+  .soon {
+    margin-top: 18px;
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+  }
+
+  footer {
+    border-top: 1px solid var(--line);
+    padding: 36px 0;
+  }
+  .foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  .foot .brand { font-size: 20px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+  }
+</style>
+</head>
+<body>
+
+<header id="hdr">
+  <div class="wrap nav">
+    <a class="brand" href="#">Д<b>о</b>ш</a>
+    <nav class="nav-links">
+      <a href="#nasil">Nasıl Oynanır</a>
+      <a href="#digraf">Digraflar</a>
+      <a href="#ozellik">Özellikler</a>
+      <a class="nav-cta" href="#indir">İndir</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ================= HERO ================= -->
+<div class="hero">
+  <div class="stars" id="stars"></div>
+
+  <div class="wrap hero-grid">
+    <div>
+      <span class="kicker rise d1">Çeçence kelime bulmaca</span>
+      <h1>
+        <span class="word-mark rise d2">Дош</span>
+        <span class="sub-mark rise d3">Her kelime bir hazine.</span>
+      </h1>
+      <p class="hero-copy rise d4">
+        Harf çarkını çevir, ızgarayı doldur, <strong>gerçek Çeçence</strong> kelimeler keşfet.
+        Kafkas dağlarının dilini oyunla öğren — tamamen ücretsiz, reklamsız.
+      </p>
+      <div class="cta-row rise d5">
+        <a class="btn btn-gold" href="#indir">Oyna — Ücretsiz</a>
+        <a class="btn btn-ghost" href="#nasil">Nasıl çalışır?</a>
+      </div>
+      <div class="hero-stats rise d5">
+        <div class="stat"><div class="n">30</div><div class="l">Seviye</div></div>
+        <div class="stat"><div class="n">15</div><div class="l">Digraf</div></div>
+        <div class="stat"><div class="n">%100</div><div class="l">Ücretsiz</div></div>
+      </div>
+    </div>
+
+    <div class="wheel-zone rise d3">
+      <div class="capsule" id="capsule">
+        <span class="w" id="capWord"></span>
+        <span class="m" id="capMeaning"></span>
+      </div>
+      <div class="wheel" id="wheel">
+        <svg class="trace" id="trace" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- layered ridges + Vainakh tower -->
+  <div class="mountains" aria-hidden="true">
+    <svg viewBox="0 0 1440 320" preserveAspectRatio="xMidYMax slice">
+      <path d="M0,210 L160,150 L300,200 L470,110 L640,190 L820,120 L1000,200 L1180,140 L1320,190 L1440,150 L1440,320 L0,320 Z"
+            fill="#121a35" opacity=".55"/>
+      <path d="M0,250 L120,200 L260,240 L420,170 L600,235 L780,180 L960,245 L1140,195 L1300,240 L1440,205 L1440,320 L0,320 Z"
+            fill="#0c1226" opacity=".85"/>
+      <!-- Vainakh tower on the right ridge -->
+      <g fill="#070b18">
+        <path d="M1150,240 L1158,128 L1186,128 L1194,240 Z"/>
+        <path d="M1154,128 L1152,118 L1160,122 L1166,114 L1172,122 L1178,114 L1184,122 L1192,118 L1190,128 Z"/>
+        <rect x="1168" y="160" width="8" height="13" rx="3" fill="#f5b62b" opacity=".75"/>
+        <rect x="1168" y="196" width="8" height="13" rx="3" fill="#f5b62b" opacity=".45"/>
+      </g>
+      <path d="M0,285 L180,245 L360,280 L560,235 L760,282 L980,240 L1180,280 L1440,250 L1440,320 L0,320 Z"
+            fill="#060a16"/>
+    </svg>
+  </div>
+</div>
+
+<!-- ================= HOW ================= -->
+<section id="nasil">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="sec-kicker">Nasıl oynanır</div>
+      <h2>Çarktan ızgaraya, üç adımda.</h2>
+    </div>
+
+    <div class="how-grid">
+      <div class="steps reveal">
+        <div class="step">
+          <h3>Harfleri birleştir</h3>
+          <p>Parmağını çarktaki harfler üzerinde sürükle. Geri dönersen son seçim geri alınır — acele etme.</p>
+        </div>
+        <div class="step">
+          <h3>Izgarayı doldur</h3>
+          <p>Doğru kelime, bulmaca ızgarasındaki yerine altın harflerle yerleşir. Her grafem coin kazandırır.</p>
+        </div>
+        <div class="step">
+          <h3>Bonusları keşfet</h3>
+          <p>Izgarada olmayan ama geçerli olan kelimeler de ödül verir. Arka arkaya çözersen kombo bonusu seni bekler.</p>
+        </div>
+      </div>
+
+      <div class="board reveal" id="board">
+        <div class="grid-demo">
+          <!-- row 0: м а л х -->
+          <div class="cell slot" style="animation-delay:.1s"><span class="ltr" style="animation-delay:.15s">м</span></div>
+          <div class="cell slot" style="animation-delay:.25s"><span class="ltr" style="animation-delay:.3s">а</span></div>
+          <div class="cell slot" style="animation-delay:.4s"><span class="ltr" style="animation-delay:.45s">л</span></div>
+          <div class="cell slot" style="animation-delay:.55s"><span class="ltr" style="animation-delay:.6s">х</span></div>
+          <!-- row 1: . . а . -->
+          <div class="cell gap"></div>
+          <div class="cell gap"></div>
+          <div class="cell slot" style="animation-delay:.95s"><span class="ltr" style="animation-delay:1s">а</span></div>
+          <div class="cell gap"></div>
+          <!-- row 2: . . м . -->
+          <div class="cell gap"></div>
+          <div class="cell gap"></div>
+          <div class="cell slot" style="animation-delay:1.15s"><span class="ltr" style="animation-delay:1.2s">м</span></div>
+          <div class="cell gap"></div>
+        </div>
+        <div class="board-caption"><b>малх</b> güneş · <b>лам</b> dağ — kesişen harf ikisinde de aynı</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= DIGRAPHS ================= -->
+<section id="digraf" class="digraph-band">
+  <div class="wrap reveal">
+    <div class="sec-kicker">Çeçen alfabesinin sırrı</div>
+    <h2>On beş digraf, on beş tek harf.</h2>
+    <p class="sec-lead">
+      Çeçencede <b style="color:var(--cream)">хь</b> ya da <b style="color:var(--cream)">кӀ</b> gibi
+      ikili harfler tek ses, tek grafem sayılır. Дош bunları çarkta tek baloncukta
+      taşır — dili yazıldığı gibi öğrenirsin. Palochka <b style="color:var(--gold)">Ӏ</b> dahil.
+    </p>
+  </div>
+  <div class="marquee" id="marquee"></div>
+</section>
+
+<!-- ================= FEATURES ================= -->
+<section id="ozellik">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="sec-kicker">Oyunun içinde</div>
+      <h2>Küçük oyun, dolu sandık.</h2>
+    </div>
+
+    <div class="feat-grid reveal">
+      <div class="feat">
+        <div class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+        <h3>Günlük görev</h3>
+        <p>Her gün seçilen bir seviye, ekstra coin ödülüyle. Hazine sandığı da günde bir kez açılır.</p>
+      </div>
+      <div class="feat">
+        <div class="ic"><svg viewBox="0 0 24 24"><path d="M4 19V5a2 2 0 0 1 2-2h13v18H6a2 2 0 0 1-2-2z"/><path d="M19 17H6a2 2 0 0 0-2 2"/></svg></div>
+        <h3>Sözlük</h3>
+        <p>Çözdüğün her kelime anlamıyla birlikte sözlüğüne eklenir. Oynadıkça kendi Çeçence dağarcığın büyür.</p>
+      </div>
+      <div class="feat">
+        <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 3l2.7 5.8 6.3.8-4.6 4.4 1.2 6.3L12 17l-5.6 3.3 1.2-6.3L3 9.6l6.3-.8z"/></svg></div>
+        <h3>Yıldız sistemi</h3>
+        <p>Temiz çözüm üç yıldız demek. Seviyeler yıldız kazandıkça sırayla açılır.</p>
+      </div>
+      <div class="feat">
+        <div class="ic"><svg viewBox="0 0 24 24"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.7.6 1 1.5 1 2.5h6c0-1 .3-1.9 1-2.5A6 6 0 0 0 12 3z"/></svg></div>
+        <h3>Akıllı ipucu</h3>
+        <p>Takıldığında coin karşılığı bir harf aç. Ama dikkat: ipucuyla biten kelime coin kazandırmaz.</p>
+      </div>
+      <div class="feat">
+        <div class="ic"><svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg></div>
+        <h3>İstatistikler</h3>
+        <p>En uzun serin, topladığın yıldızlar, bulduğun bonus kelimeler — ilerlemen hep gözünün önünde.</p>
+      </div>
+      <div class="feat">
+        <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-9-9a5 5 0 0 1 9-3 5 5 0 0 1 9 3c-2 4.5-9 9-9 9z"/></svg></div>
+        <h3>Ücretsiz, reklamsız</h3>
+        <p>Satın alma yok, reklam yok, veri toplama yok. Sadece dil ve oyun.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= MISSION ================= -->
+<section class="mission">
+  <div class="wrap mission-inner reveal">
+    <div class="mission-mark">Ӏ</div>
+    <div>
+      <blockquote>
+        Bir dil, onu konuşan <em>her yeni kelimeyle</em> yaşar.
+        Дош, Çeçenceyi oyunla yaşatmak için yapıldı.
+      </blockquote>
+      <p class="mission-note">
+        Oyundaki her kelime doğrulanmış gerçek Çeçencedir — uydurma içerik asla yazılmaz.
+        Bir çevirinin henüz hazır olmadığı yerde oyun bunu gizlemez; içerik ancak
+        gerçek kaynaklarla büyür.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CTA / FOOTER ================= -->
+<section id="indir" class="final">
+  <div class="wrap reveal">
+    <div class="sec-kicker">İndir</div>
+    <h2 style="max-width:none">Çark seni bekliyor.</h2>
+    <div class="badges">
+      <a class="badge" href="#" aria-disabled="true">
+        <svg viewBox="0 0 24 24"><path d="M16.4 12.8c0-2.4 2-3.6 2.1-3.7-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.7.9-.8 0-1.9-.9-3.2-.9-1.6 0-3.1 1-4 2.4-1.7 2.9-.4 7.3 1.2 9.7.8 1.2 1.8 2.5 3 2.4 1.2 0 1.7-.8 3.2-.8s1.9.8 3.2.8c1.3 0 2.2-1.2 3-2.3.9-1.4 1.3-2.7 1.3-2.7s-2.5-1-2.6-3.9zM14 5.6c.7-.8 1.1-1.9 1-3-1 0-2.1.7-2.8 1.5-.6.7-1.2 1.8-1 2.9 1.1.1 2.2-.6 2.8-1.4z"/></svg>
+        <span class="t"><small>App Store</small><span>iOS için</span></span>
+      </a>
+      <a class="badge" href="#" aria-disabled="true">
+        <svg viewBox="0 0 24 24"><path d="M4 3.5v17c0 .4.4.6.7.4l9.6-8.1c.2-.2.2-.5 0-.7L5 3.1c-.4-.3-1 0-1 .4zm12.2 6.4l-2.3 1.9 2.3 2 3-1.3c.5-.2.5-.9 0-1.1l-3-1.5z"/></svg>
+        <span class="t"><small>Google Play</small><span>Android için</span></span>
+      </a>
+      <a class="badge" href="#" aria-disabled="true">
+        <svg viewBox="0 0 24 24"><path d="M3 5.5l7.5-1v7H3v-6zm8.5-1.2L21 3v8.5h-9.5v-7.2zM3 12.5h7.5v7L3 18.5v-6zm8.5 0H21V21l-9.5-1.3v-7.2z"/></svg>
+        <span class="t"><small>Windows</small><span>PC için</span></span>
+      </a>
+    </div>
+    <div class="soon">Mağaza sayfaları yakında</div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot">
+    <a class="brand" href="#">Д<b>о</b>ш</a>
+    <span>Çeçence kelime bulmaca · ücretsiz &amp; reklamsız</span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ---- header border on scroll ---- */
+  var hdr = document.getElementById('hdr');
+  addEventListener('scroll', function () {
+    hdr.classList.toggle('scrolled', scrollY > 10);
+  }, { passive: true });
+
+  /* ---- star field ---- */
+  var stars = document.getElementById('stars');
+  for (var i = 0; i < 70; i++) {
+    var s = document.createElement('span');
+    s.className = 'star';
+    s.style.left = (Math.random() * 100) + '%';
+    s.style.top = (Math.random() * 70) + '%';
+    s.style.animationDelay = (Math.random() * 4) + 's';
+    s.style.animationDuration = (3 + Math.random() * 4) + 's';
+    if (Math.random() < .25) { s.style.width = s.style.height = '3px'; }
+    stars.appendChild(s);
+  }
+
+  /* ---- digraph marquee (doubled for seamless loop) ---- */
+  var DIGRAPHS = ['аь','гӀ','кх','къ','кӀ','оь','пӀ','тӀ','уь','хь','хӀ','цӀ','чӀ','юь','яь'];
+  var marquee = document.getElementById('marquee');
+  DIGRAPHS.concat(DIGRAPHS).forEach(function (d) {
+    var t = document.createElement('div');
+    t.className = 'tile';
+    t.innerHTML = '<span class="dg">' + d + '</span><span class="one">tek harf</span>';
+    marquee.appendChild(t);
+  });
+
+  /* ---- scroll reveals ---- */
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) {
+        e.target.classList.add('in');
+        if (e.target.id === 'board') e.target.classList.add('play');
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: .25 });
+  document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+
+  /* ---- hero letter wheel: traces & solves real Chechen words ---- */
+  var LETTERS = ['д', 'о', 'ш', 'л', 'а', 'м', 'х'];
+  var WORDS = [
+    { w: 'дош',  m: 'söz · kelime' },
+    { w: 'малх', m: 'güneş' },
+    { w: 'лам',  m: 'dağ' }
+  ];
+
+  var wheel = document.getElementById('wheel');
+  var trace = document.getElementById('trace');
+  var capsule = document.getElementById('capsule');
+  var capWord = document.getElementById('capWord');
+  var capMeaning = document.getElementById('capMeaning');
+
+  // place bubbles on the circle; remember each letter's position (0–100 coords)
+  var pos = {};
+  var bubbles = {};
+  LETTERS.forEach(function (ltr, i) {
+    var ang = (-90 + i * (360 / LETTERS.length)) * Math.PI / 180;
+    var x = 50 + 37 * Math.cos(ang);
+    var y = 50 + 37 * Math.sin(ang);
+    pos[ltr] = { x: x, y: y };
+    var b = document.createElement('div');
+    b.className = 'bubble';
+    b.textContent = ltr;
+    b.style.left = x + '%';
+    b.style.top = y + '%';
+    wheel.appendChild(b);
+    bubbles[ltr] = b;
+  });
+
+  function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+
+  function drawSegment(a, b) {
+    var ln = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    ln.setAttribute('x1', a.x); ln.setAttribute('y1', a.y);
+    ln.setAttribute('x2', a.x); ln.setAttribute('y2', a.y);
+    trace.appendChild(ln);
+    var t0 = performance.now(), DUR = 260;
+    (function step(t) {
+      var k = Math.min((t - t0) / DUR, 1);
+      ln.setAttribute('x2', a.x + (b.x - a.x) * k);
+      ln.setAttribute('y2', a.y + (b.y - a.y) * k);
+      if (k < 1) requestAnimationFrame(step);
+    })(t0);
+  }
+
+  async function playWord(entry) {
+    var letters = entry.w.split('');
+    var prev = null;
+    for (var i = 0; i < letters.length; i++) {
+      var ltr = letters[i];
+      bubbles[ltr].classList.add('active');
+      if (prev) drawSegment(pos[prev], pos[ltr]);
+      prev = ltr;
+      await sleep(430);
+    }
+    capWord.textContent = entry.w;
+    capMeaning.textContent = entry.m;
+    capsule.classList.add('show');
+    await sleep(1900);
+    capsule.classList.remove('show');
+    letters.forEach(function (l) { bubbles[l].classList.remove('active'); });
+    trace.innerHTML = '';
+    await sleep(650);
+  }
+
+  (async function loop() {
+    await sleep(1300); // let the hero entrance finish first
+    for (var i = 0; ; i = (i + 1) % WORDS.length) {
+      await playWord(WORDS[i]);
+    }
+  })();
+})();
+</script>
+</body>
+</html>

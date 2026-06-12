@@ -5,13 +5,15 @@ import 'package:flutter/material.dart';
 import '../theme.dart';
 
 /// Harf çarkının üstündeki seçilen kelime kapsülü.
-/// Yanlış kelimede sallanır; doğru kelimede büyüyüp solarak kaybolur.
+/// Yanlış kelimede sallanır; doğru kelimede büyüyüp solarak kaybolur;
+/// bonus kelimede kısa altın pulse ile vurgulanır.
 class WordCapsule extends StatefulWidget {
   const WordCapsule({
     super.key,
     required this.text,
     required this.shakeTick,
     required this.successTick,
+    required this.bonusTick,
     required this.successText,
   });
 
@@ -20,6 +22,7 @@ class WordCapsule extends StatefulWidget {
 
   final int shakeTick;
   final int successTick;
+  final int bonusTick;
 
   /// Başarı animasyonunda gösterilecek son çözülen kelime.
   final String successText;
@@ -37,6 +40,10 @@ class _WordCapsuleState extends State<WordCapsule>
   late final AnimationController _success = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 520),
+  );
+  late final AnimationController _bonus = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 380),
   );
   late final AnimationController _tick = AnimationController(
     vsync: this,
@@ -56,6 +63,9 @@ class _WordCapsuleState extends State<WordCapsule>
     if (widget.successTick != oldWidget.successTick) {
       _success.forward(from: 0);
     }
+    if (widget.bonusTick != oldWidget.bonusTick) {
+      _bonus.forward(from: 0);
+    }
     // Yeni harf eklendiğinde minik canlılık tıklaması
     if (widget.text.length > oldWidget.text.length) {
       _tick.forward(from: 0);
@@ -66,6 +76,7 @@ class _WordCapsuleState extends State<WordCapsule>
   void dispose() {
     _shake.dispose();
     _success.dispose();
+    _bonus.dispose();
     _tick.dispose();
     super.dispose();
   }
@@ -76,12 +87,13 @@ class _WordCapsuleState extends State<WordCapsule>
       height: 54,
       child: Center(
         child: AnimatedBuilder(
-          animation: Listenable.merge([_shake, _success, _tick]),
+          animation: Listenable.merge([_shake, _success, _bonus, _tick]),
           builder: (context, _) {
             String text = widget.text;
             double opacity = 1;
             double scale = 1 + 0.06 * sin(pi * _tick.value);
             double dx = 0;
+            Color borderColor = const Color(0xFFFFF6D8);
 
             if (text.isEmpty && _shake.isAnimating) {
               text = _shakeText;
@@ -95,6 +107,19 @@ class _WordCapsuleState extends State<WordCapsule>
               final v = _success.value;
               opacity = 1 - Curves.easeIn.transform(v);
               scale = 1 + 0.16 * Curves.easeOut.transform(v);
+            }
+            // Bonus kelime pulse: sadece bonus animasyonu sırasında text varsa
+            // (yani henüz submit edilmedi, kullanıcı seçim yapıyor).
+            if (_bonus.isAnimating && text.isNotEmpty) {
+              final v = _bonus.value;
+              scale = 1 + 0.10 * sin(pi * v);
+              // Son anlarda altın parıltı için border tonu değişimi
+              final goldPulse = (sin(pi * v) * 0.5 + 0.5).clamp(0.0, 1.0);
+              borderColor = Color.lerp(
+                const Color(0xFFFFF6D8),
+                const Color(0xFFFFE489),
+                goldPulse,
+              )!;
             }
             if (text.isEmpty) return const SizedBox.shrink();
 
@@ -121,7 +146,7 @@ class _WordCapsuleState extends State<WordCapsule>
                       ),
                       borderRadius: BorderRadius.circular(26),
                       border: Border.all(
-                        color: const Color(0xFFFFF6D8),
+                        color: borderColor,
                         width: 2,
                       ),
                       boxShadow: const [

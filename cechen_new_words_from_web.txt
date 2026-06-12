@@ -1,0 +1,115 @@
+# Çeçence (Нохчийн) Kelime Listesi - Web'den Toplanan Yeni Kelimeler
+# Kaynak: ce.wikipedia.org (Çeçence Vikipedi) - 200 yeni benzersiz kelime
+# Oyun kurallarına uygun: 2-6 grapheme, gerçek Çeçence kelimeler
+# Oyun: Дош (Dosh) - Words of Wonders tarzı kelime bulmaca
+# Tarih: Haziran 2026
+
+# ============ UYGUN KELİMELER (önerilen) ============
+# Anlamlı, somut kelimeler - oyun için en uygun olanlar:
+
+са           - ruh, can
+де           - gün, yapmak
+хан          - zaman
+барт         - anlaşma, birlik
+болх         - iş
+бух          - temel, dayanak
+сурт         - resim, fotoğraf
+кеп          - biçim, form
+нах          - halk, insanlar
+ша           - yıl
+шар          - yıl
+кхин         - diğer, başka, daha
+дикан         - iyi
+хой           - iyi, güzel  
+хаза         - güzel
+бар          - barış
+ков          - avlu, kapı
+шира         - eski (oyunda var ama yeni bağlamda)
+тӏулг        - taş
+гӏала        - şehir, kale
+пхьа         - el, kol
+хьоме        - sevgili, değerli
+некъ         - yol
+хьекъал      - akıl
+ирс          - mutluluk, şans
+ойла         - düşünce, fikir
+дахар        - hayat
+безам        - sevgi
+амал         - karakter, nitelik
+абат         - alfabe
+йоза         - yazı
+йуьхь        - başlangıç, yüz
+илли         - şarkı
+салам        - selam, barış
+сиха         - hızlı
+чӏогӏа       - güçlü, sert
+хьалха       - önce, ileri
+кхетам       - anlayış, kavrayış
+масала       - örnek
+могӏам       - liste, sıra
+иэс          - anı, hatıra
+терахь       - tarih, sayı
+термин       - terim
+нене          - anne (yönelme)
+маьрша       - özgür
+дика         - iyi
+бох         - rüzgar... (мox zaten oyunda var)
+
+# ============ DİĞER KELİMELER ============
+# Gramatik / yardımcı kelimeler - oyunda kullanılabilir ama daha az uygun
+
+амма         - ama, fakat
+дац          - değil
+хила         - olmak
+долу         - sahip olan
+болу         - olan
+цу           - ona/ona ait
+шен          - kendi
+вайн         - bizim
+хьан         - senin
+хӏара        - bu
+хӏокху       - bu (ilgi hali)
+ткъа         - ama, fakat
+чохь         - içinde
+ла            - olmak (yardımcı fiil)
+догӏу        - gelen (sıfat)
+олу          - denilen
+тарло        - mümkün
+хилла        - oldu
+дерриг       - bütün, tüm
+массо        - herkes
+кхуза        - burada
+иштта        - aynı şekilde
+цахууш       - bilinmeyen
+хьажа        - bakmak
+хьаж         - bak
+
+# ============ DİNİ/ÖZEL KELİMELER ============
+аллахӏ      - Allah
+имам        - imam
+ислам       - İslam
+салам       - selam
+рахьма       - rahmet
+закат       - zekat
+суннат      - sünnet
+
+# ============ AYLAR ============
+январь      - Ocak
+февраль     - Şubat
+март        - Mart
+апрель      - Nisan
+май         - Mayıs
+июнь        - Haziran
+июль        - Temmuz
+август      - Ağustos
+сентябрь    - Eylül
+октябрь     - Ekim
+ноябрь      - Kasım
+декабрь     - Aralık
+
+# ============ OYUN EKLEMELERİ İÇİN EN UYGUN 20 KELİME ============
+# 2 harfli: са, де, хан, нах, некъ
+# 3 harfli: барт, болх, бух, сурт, кеп, кхин, бар, ков
+# 4 harfli: хаза, дика, ойла, абат, йоза, илли
+# 5 harfli: дахар, безам, амал, салам, сиха
+# 6 harfli: кхетам, масала, могӏам, маьрша

@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Guidance for AI assistants working in this repository.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project overview
 
@@ -9,13 +9,16 @@ Guidance for AI assistants working in this repository.
 
 - Target platforms: **Android, iOS, Windows**. `web` is used only for local
   development/preview.
-- Package name / app id: `dosh` (see `pubspec.yaml`).
-- Dart SDK: `^3.5.0`. Dependencies: `audioplayers`, `shared_preferences`.
+- Audience: Turkish speakers learning Chechen. Free, no ads or purchases.
+- Dart SDK: `^3.5.0`. Runtime deps: `audioplayers`, `shared_preferences`.
+  Dev deps include `flutter_launcher_icons` and `flutter_native_splash`
+  (icon/splash configured in `pubspec.yaml`).
+- `game-improvement-spec.md` is the user-approved feature spec — consult it
+  before changing game behavior or content.
 
 ### Language conventions in this repo
 
-- **UI chrome text is Turkish** (e.g. `Başla`, `Seviye 1`, `Ses`) — the game
-  is authored for a Turkish-speaking audience playing in Chechen.
+- **UI chrome text is Turkish** (e.g. `Başla`, `Seviye 1`, `Ses`).
 - **Code comments, doc comments, README, and error messages are in Turkish.**
   Match this when editing existing files; do not rewrite Turkish comments into
   English.
@@ -34,7 +37,12 @@ Guidance for AI assistants working in this repository.
   it never shows made-up text.
 
 When adding words or levels, only add an `info_*` translation if you have a
-genuine Chechen source. Otherwise leave it out.
+genuine Chechen source. Otherwise leave it out. Word-list source files live at
+the repo root (`cechen_curated_for_game.txt`, `cechen_words_master.txt`,
+`cechen_full_wordlist.txt`, `cechen_new_words_from_web.txt`,
+`bonus_candidates.json`, `english_terms.json`) — draw new content from these,
+never from imagination. `fetch_words.py` is the scraper that produced the
+web word list.
 
 ## Architecture
 
@@ -45,31 +53,34 @@ effects (sounds, animations).
 ```
 lib/
   main.dart              # bootstrap: orientation lock, load i18n/levels/store, runApp
-  app.dart               # DoshApp: Home <-> Game switch, owns GameSound
+  app.dart               # DoshApp: screen switcher (home/gallery/game/settings/
+                         # stats/dictionary), owns GameSound + theme index
   core/
     graphemes.dart       # Chechen grapheme tokenizer + normalize() (palochka)
     strings.dart         # Strings: tiny i18n (key -> real Chechen, else key)
     constants.dart       # GameConfig: coin economy + layout constants
+    scoring.dart         # Scoring: pure reward/star functions (no state)
   data/
-    models.dart          # Cell, PlacedWord, Level (+ JSON + validate())
+    models.dart          # Cell, PlacedWord, Level (+ JSON + validate(), bonusWords)
     level_repository.dart # loads & validates assets/levels/levels.json
-    progress_store.dart  # ProgressStore: coins/level/sound via SharedPreferences
+    progress_store.dart  # coins, stars, solved words, streaks, daily state, theme
   game/
-    game_controller.dart # GameController: rules, selection, scoring, hints, shuffle
+    game_controller.dart # GameController: rules, selection, hints, shuffle, events
   audio/
     game_sound.dart      # GameSound: SoundCue -> AudioPlayer, mute toggle persisted
   ui/
-    theme.dart           # AppColors palette + buildTheme()
-    screens/             # home_screen.dart, game_screen.dart
+    theme.dart           # AppColors palette + buildTheme() + SceneTheme variants
+    screens/             # home, gallery (level select), game, settings, stats,
+                         # dictionary (solved-word meanings)
     widgets/             # letter_wheel, crossword_grid, word_capsule, coin_box,
-                         # info_strip, top_bar, round_icon_button,
-                         # scenic_background, effects/confetti_burst
+                         # info_strip, top_bar, level_complete_panel,
+                         # tutorial_guide, scenic_background, effects/confetti_burst
 assets/
-  i18n/ce.json           # localization keys -> Chechen
+  i18n/ce.json           # localization keys -> Chechen (+ info_* word meanings)
   levels/levels.json     # level definitions (validated at load + in tests)
   fonts/                 # NotoSans (full Cyrillic + palochka Ӏ)
   audio/                 # *.wav sound cues
-  backgrounds/           # optional scenic photo
+  icon/                  # app icon source + generate_icon.py
 ```
 
 ### Key concepts
@@ -83,24 +94,33 @@ assets/
 
 - **GameController (`game/game_controller.dart`).** The single source of game
   truth, UI-independent and unit-tested. `enterBubble`/`releaseSelection` drive
-  selection (back-tracking to the previous bubble undoes the last pick).
-  `_solve` awards `graphemes.length * coinsPerGrapheme` coins; hint-completed
-  words give **no** coin reward. Emits `GameEvent`s on a `sync` broadcast stream
-  so the UI's animation triggers stay deterministic.
+  selection (back-tracking to the previous bubble undoes the last pick). Emits
+  `GameEvent`s on a `sync` broadcast stream so UI animation triggers stay
+  deterministic.
 
-- **Levels (`data/models.dart`).** `Level.validate()` enforces invariants:
-  every word ≥ 2 graphemes, buildable from the wheel `letters`, and intersecting
-  cells must agree on their grapheme (`targetByCell` throws on conflict).
-  `LevelRepository.load()` runs `validate()` on every level at startup, and the
-  level test loads the real asset — so a bad level breaks the build's tests.
+- **Scoring (`core/scoring.dart`).** Pure functions, separate from controller
+  state: word solve pays `graphemes × coinsPerGrapheme` plus a combo bonus
+  every `comboMilestone` consecutive no-hint solves; hint-completed words pay
+  **nothing**; off-grid bonus words pay a flat `bonusWordCoins`. Stars:
+  3⭐ clean level, 2⭐ ≤2 mistakes & ≤1 hint, else 1⭐. All amounts live in
+  `GameConfig` (`core/constants.dart`), including the daily gift and daily
+  challenge bonus.
 
-- **Persistence (`data/progress_store.dart`).** Coins, current level index, and
-  sound on/off are stored in `SharedPreferences` (works on all platforms).
-  Defaults: `startCoins = 100`.
+- **Levels (`data/models.dart` + `assets/levels/levels.json`).** Level id 0 is
+  the **tutorial** (always unlocked, hidden in the gallery); ids 1+ unlock
+  sequentially once the previous level has stars. Each level also carries
+  `bonus` words — valid off-grid words buildable from the wheel.
+  `Level.validate()` enforces invariants: every word ≥ 2 graphemes, buildable
+  from the wheel `letters`, intersecting cells agree on their grapheme, and
+  bonus words are not duplicates of grid words. `LevelRepository.load()`
+  validates every level at startup, and `levels_test.dart` loads the real
+  asset — a bad level breaks the test suite.
 
-- **Economy (`core/constants.dart`).** `startCoins=100`, `hintCost=25`,
-  `coinsPerGrapheme=5`, `maxContentWidth=520` (caps the play column on
-  wide/desktop screens).
+- **Persistence (`data/progress_store.dart`).** Everything player-visible is in
+  `SharedPreferences`: coins, per-level stars and solved words, tutorial-done,
+  best streak, daily gift/challenge state, and theme index. It also derives
+  stats (totals, completed counts) and the deterministic
+  `dailyLevelIndex(...)` used by the daily challenge.
 
 ## Development workflow
 
@@ -113,6 +133,7 @@ kept as a record of the intended verify chain (`pub get` → `analyze` → `test
 flutter pub get            # install dependencies
 flutter analyze            # static analysis (flutter_lints, see analysis_options.yaml)
 flutter test               # run all tests
+flutter test test/controller_test.dart   # run a single test file
 flutter run -d web-server  # local dev/preview in a browser
 flutter run -d windows     # Windows desktop
 flutter run                # connected Android/iOS device
@@ -126,10 +147,13 @@ suite is the safety net for content correctness, not just code.
 - `graphemes_test.dart` — tokenization, digraphs, palochka/case normalization.
 - `levels_test.dart` — loads the real `levels.json`, asserts validation passes
   and ids are unique.
-- `controller_test.dart` — game rules: correct/wrong words, coin rewards,
-  already-found, hints, hint-completed level finish, shuffle, nextLevel reset.
-- `widget_test.dart` — home→game flow, wheel letters render, drag-to-solve
-  updates grid + coin box; confirms missing translations show the technical key.
+- `controller_test.dart` — game rules: correct/wrong words, rewards, hints,
+  bonus words, shuffle, nextLevel reset.
+- `scoring_test.dart` — reward math, combo milestones, star thresholds.
+- `game_sound_test.dart` — sound cue mapping and mute persistence.
+- `widget_test.dart` — home→game flow, drag-to-solve updates grid + coin box;
+  confirms missing translations show the technical key.
+- `screenshot_test.dart` — renders screens for visual capture.
 
 ## Adding a level
 
@@ -141,18 +165,21 @@ Edit `assets/levels/levels.json`. Each level:
   "letters": ["х", "ь", "о"],
   "words": [
     { "word": "хьо", "row": 0, "col": 0, "dir": "across" }
-  ]
+  ],
+  "bonus": ["хо"]
 }
 ```
 
 - Digraphs are single elements in `letters` (e.g. `"хь"`, not `"х","ь"`).
 - `dir` is `"across"` or `"down"`. Coordinates are absolute grid `row`/`col`;
   the grid auto-crops to the used bounds.
-- Every word must be buildable from `letters`, and intersecting cells must carry
-  the same grapheme. `flutter test` verifies this automatically — run it.
+- Every word (grid and bonus) must be buildable from `letters`; intersecting
+  cells must carry the same grapheme; bonus words must not duplicate grid
+  words. `flutter test` verifies all of this — run it.
+- Keep id 0 as the tutorial; new levels get the next sequential id (unlock
+  order follows ids).
 - Add real Chechen for the level title (`level_<id>`) and any `info_<word>`
   footnotes in `assets/i18n/ce.json`; omit if you don't have a real source.
-
 
 ## Conventions & gotchas
 
@@ -161,9 +188,8 @@ Edit `assets/levels/levels.json`. Each level:
 - New assets must be registered under `flutter:` in `pubspec.yaml`.
 - Audio and orientation lock fail silently off their supported platforms (e.g.
   in tests / web); preserve that — game flow must not depend on them.
-- The scenic background is currently vector-drawn
-  (`ui/widgets/scenic_background.dart`); to use a real photo, add it under
-  `assets/backgrounds/`, register it, and follow the in-file guidance.
+- The scenic background is vector-drawn with selectable `SceneTheme` variants
+  (`ui/widgets/scenic_background.dart`, theme picked in settings).
 
 ## Git workflow
 

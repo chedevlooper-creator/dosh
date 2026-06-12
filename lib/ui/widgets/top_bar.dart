@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../theme.dart';
 import 'round_icon_button.dart';
 
-/// Üst oyun barı: solda geri + menü, ortada bölüm adı, sağda galeri + ayarlar.
+/// Üst oyun barı: solda geri, ortada bölüm adı, sağda ayarlar.
 /// Bölüm adı localization anahtarından gelir; gerçek Çeçence karşılık yoksa
 /// teknik anahtar görünür (tasarım kuralı).
 class TopBar extends StatelessWidget {
@@ -11,16 +11,12 @@ class TopBar extends StatelessWidget {
     super.key,
     required this.title,
     this.onBack,
-    this.onMenu,
-    this.onGallery,
     this.onSettings,
     this.settingsIcon = Icons.settings_rounded,
   });
 
   final String title;
   final VoidCallback? onBack;
-  final VoidCallback? onMenu;
-  final VoidCallback? onGallery;
   final VoidCallback? onSettings;
   final IconData settingsIcon;
 
@@ -31,8 +27,6 @@ class TopBar extends StatelessWidget {
       child: Row(
         children: [
           _BarSlot(icon: Icons.arrow_back_rounded, onTap: onBack),
-          const SizedBox(width: 8),
-          _BarSlot(icon: Icons.menu_rounded, onTap: onMenu),
           Expanded(
             child: Center(
               child: Container(
@@ -69,8 +63,6 @@ class TopBar extends StatelessWidget {
               ),
             ),
           ),
-          _BarSlot(icon: Icons.collections_rounded, onTap: onGallery),
-          const SizedBox(width: 8),
           _BarSlot(icon: settingsIcon, onTap: onSettings),
         ],
       ),

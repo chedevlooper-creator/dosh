@@ -1,0 +1,138 @@
+# ============================================================
+# ÇEÇENCE KELİMELER - OYUN "Дош" İÇİN SEÇİLMİŞ UYGUN KELİMELER
+# ============================================================
+# Kaynak: en.wiktionary.org'dan taranan 766 kelime içinden
+# oyun word puzzle formatına en uygun 223 kelime seçildi.
+#   - 2-6 grapheme
+#   - Somut/sık kullanılan anlamlı kelimeler
+#   - Gramatik kelimeler elendi
+#   - Kategorilere ayrıldı
+# ============================================================
+
+[VÜCUT / ORGANLAR]
+белш          — omuz
+бӏар          — göz
+бӏара         — göz (ilgi hali)
+мӏара         — tırnak
+накха         — göğüs
+пхьар         — erkek
+пхьид         — parmak
+пӏелг         — parmak
+церг          — diş
+пӏенда        — yanak, avuç
+
+[DOĞA / HAYVAN]
+борз          — kurt
+борц          — buzağı
+бутт          — ay (gökcismi), ay (zaman)
+бурам         — deve
+говр          — at
+гурма         — manda
+гуьйре        — sonbahar
+гӏала         — şehir, kale
+гӏама         — kum
+дукъ          — tepe, sırt
+дуьне         — dünya
+жӏаьла        — köpek
+моза          — sinek, arı
+мохк          — ülke, toprak
+сий           — geyik
+суьйре        — akşam
+тӏулг         — taş
+хьоза         — kuş
+хӏаваъ        — hava
+хӏорд         — deniz
+цӏа           — ev
+чам           — tat, lezzet
+эвла          — köy
+ӏаж           — elma
+ӏам           — göl
+ӏуьйре        — sabah
+еара          — çayır
+
+[YİYECEK]
+бепиг         — ekmek
+малар         — içecek
+мерза         — tatlı
+нехча         — peynir
+тӏам          — damak tadı, tat
+шекар         — şeker
+
+[NESNELER / ARAÇLAR]
+абат          — alfabe
+йоза          — yazı
+кехат         — kağıt, mektup
+ловзар        — oyun
+меттиг        — yer, mekan
+некъ          — yol
+пен           — duvar
+сурт          — resim
+таж           — taç
+тхов          — çatı
+урам          — sokak
+хаам          — haber, mesaj
+хабар         — haber
+хен           —... (zaman ait)
+эскар         — ordu
+ӏилма         — ilim, bilim
+хӏусам        — ev, bina
+
+[RENKLER / SIFATLAR]
+горга         — yuvarlak
+керла         — yeni
+къена         — eski
+къона         — genç
+кӏай          — beyaz
+кӏайн         — beyaz
+кӏорга        — koyu, derin
+кӏеда         — yumuşak
+муьста        — ekşi
+сийна         — mavi
+шера          — düz, geniş
+шийла         — soğuk, buz gibi
+ӏаьржа        — siyah
+жима          — küçük
+готта         — dar, sıkı
+довха         — sıcak
+дукха         — çok
+деха          — uzun
+доца          — kısa
+лоха          — alçak
+шуьйра        — geniş
+боьха         — kirli
+дика          — iyi
+
+[SOYUT / KAVRAM]
+барт          — anlaşma, birlik
+безам         — sevgi
+беркат        — bereket
+болх          — iş
+бух           — temel, dayanak
+дахар         — hayat
+дийнат        — varlık, canlı
+дов           — dava, kavga
+кхерам        — tehlike
+маршо         — özgürlük
+машар         — barış
+ойла          — düşünce
+са            — ruh, can
+валар         — ölüm
+дийцар        — hikaye, anlatı
+иэс           — hatıra
+саба          — sebep
+саца          — karar
+тешам         — güven
+хешт          — izin
+
+[DİĞER KELİMELER]
+нускал        — gelin
+шад           — bal
+човка         — çorba
+чоь           — oda
+яьшка         — kutu
+ӏад           — uyku
+ӏадат         — adet, gelenek
+яхта          —... 
+нис           — doğru
+сахьт         — saat
+цийг          — kedi

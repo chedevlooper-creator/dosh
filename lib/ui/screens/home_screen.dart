@@ -17,13 +17,23 @@ class HomeScreen extends StatefulWidget {
     required this.levels,
     required this.store,
     required this.sound,
+    required this.theme,
     required this.onStart,
+    this.onDailyChallenge,
+    this.onStats,
+    this.onDictionary,
+    this.onSettings,
   });
 
   final List<Level> levels;
   final ProgressStore store;
   final GameSound sound;
+  final SceneTheme theme;
   final VoidCallback onStart;
+  final VoidCallback? onDailyChallenge;
+  final VoidCallback? onStats;
+  final VoidCallback? onDictionary;
+  final VoidCallback? onSettings;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -89,7 +99,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            const ScenicBackground(showPlayArea: false),
+            ScenicBackground(showPlayArea: false, theme: widget.theme),
             const _HomeReadabilityOverlay(),
             const _FlyingBirds(),
             Positioned.fill(child: _GiftClaimBurst(trigger: _giftBurstTick)),
@@ -119,11 +129,22 @@ class _HomeScreenState extends State<HomeScreen> {
                               sound: widget.sound,
                               giftAvailable: _giftAvailable,
                               onGift: _claimGift,
+                              onStats: widget.onStats,
+                              onDictionary: widget.onDictionary,
+                              onSettings: widget.onSettings,
                             ),
                             SizedBox(
                               height: tiny ? 4 : (veryCompact ? 22 : 42),
                             ),
                             _TitleBlock(compact: compact, tiny: tiny),
+                            if (!tiny)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 10),
+                                child: _DailyChallengeCard(
+                                  done: widget.store.dailyChallengeDone,
+                                  onTap: widget.onDailyChallenge ?? () {},
+                                ),
+                              ),
                             const Spacer(),
                             _HomeActionBand(
                               levelTitle: Strings.t('level_$levelNumber'),
@@ -282,8 +303,7 @@ class _FlyingBirdsState extends State<_FlyingBirds>
 
   @override
   Widget build(BuildContext context) {
-    final reduceMotion = MediaQuery.disableAnimationsOf(context);
-    if (reduceMotion) {
+    if (MotionSettings.reduced(context)) {
       return const IgnorePointer(
         child: CustomPaint(
           painter: _BirdsPainter(progress: 0.22),
@@ -384,18 +404,24 @@ class _HomeTopRow extends StatelessWidget {
     required this.sound,
     required this.giftAvailable,
     required this.onGift,
+    this.onStats,
+    this.onDictionary,
+    this.onSettings,
   });
 
   final int coins;
   final GameSound sound;
   final bool giftAvailable;
   final VoidCallback onGift;
+  final VoidCallback? onStats;
+  final VoidCallback? onDictionary;
+  final VoidCallback? onSettings;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        _SoundPill(sound: sound),
+        _SoundPill(sound: sound, onStats: onStats, onDictionary: onDictionary, onSettings: onSettings),
         const Spacer(),
         _GiftPill(available: giftAvailable, onTap: onGift),
         const SizedBox(width: 10),
@@ -474,9 +500,12 @@ class _GiftPill extends StatelessWidget {
 }
 
 class _SoundPill extends StatelessWidget {
-  const _SoundPill({required this.sound});
+  const _SoundPill({required this.sound, this.onStats, this.onDictionary, this.onSettings});
 
   final GameSound sound;
+  final VoidCallback? onStats;
+  final VoidCallback? onDictionary;
+  final VoidCallback? onSettings;
 
   @override
   Widget build(BuildContext context) {
@@ -484,34 +513,114 @@ class _SoundPill extends StatelessWidget {
       listenable: sound,
       builder: (context, _) {
         final label = Strings.t('sound');
-        return Tooltip(
-          message: label,
-          child: Semantics(
-            button: true,
-            label: label,
-            child: Material(
-              color: const Color(0xDDFBF6EB),
-              shape: const CircleBorder(
-                side: BorderSide(color: Color(0xAAFFFFFF)),
-              ),
-              elevation: 8,
-              shadowColor: const Color(0x33000000),
-              child: InkWell(
-                customBorder: const CircleBorder(),
-                onTap: sound.toggle,
-                child: SizedBox.square(
-                  dimension: 52,
-                  child: Icon(
-                    sound.enabled
-                        ? Icons.volume_up_rounded
-                        : Icons.volume_off_rounded,
-                    color: AppColors.ink,
-                    size: 25,
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Tooltip(
+              message: label,
+              child: Semantics(
+                button: true,
+                label: label,
+                child: Material(
+                  color: const Color(0xDDFBF6EB),
+                  shape: const CircleBorder(
+                    side: BorderSide(color: Color(0xAAFFFFFF)),
+                  ),
+                  elevation: 8,
+                  shadowColor: const Color(0x33000000),
+                  child: InkWell(
+                    customBorder: const CircleBorder(),
+                    onTap: sound.toggle,
+                    child: SizedBox.square(
+                      dimension: 52,
+                      child: Icon(
+                        sound.enabled
+                            ? Icons.volume_up_rounded
+                            : Icons.volume_off_rounded,
+                        color: AppColors.ink,
+                        size: 25,
+                      ),
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
+            const SizedBox(width: 8),
+            Semantics(
+              label: 'İstatistik',
+              button: true,
+              child: Material(
+                color: const Color(0xDDFBF6EB),
+                shape: const CircleBorder(
+                  side: BorderSide(color: Color(0xAAFFFFFF)),
+                ),
+                elevation: 8,
+                shadowColor: const Color(0x33000000),
+                child: InkWell(
+                  customBorder: const CircleBorder(),
+                  onTap: onStats,
+                  child: const SizedBox.square(
+                    dimension: 52,
+                    child: Icon(
+                      Icons.bar_chart_rounded,
+                      color: AppColors.ink,
+                      size: 24,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Semantics(
+              label: 'Sözlük',
+              button: true,
+              child: Material(
+                color: const Color(0xDDFBF6EB),
+                shape: const CircleBorder(
+                  side: BorderSide(color: Color(0xAAFFFFFF)),
+                ),
+                elevation: 8,
+                shadowColor: const Color(0x33000000),
+                child: InkWell(
+                  customBorder: const CircleBorder(),
+                  onTap: onDictionary,
+                  child: const SizedBox.square(
+                    dimension: 52,
+                    child: Icon(
+                      Icons.menu_book_rounded,
+                      color: AppColors.ink,
+                      size: 24,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Semantics(
+              label: 'Ayarlar',
+              button: true,
+              child: Material(
+                color: const Color(0xDDFBF6EB),
+                shape: const CircleBorder(
+                  side: BorderSide(color: Color(0xAAFFFFFF)),
+                ),
+                elevation: 8,
+                shadowColor: const Color(0x33000000),
+                child: InkWell(
+                  customBorder: const CircleBorder(),
+                  onTap: onSettings,
+                  child: const SizedBox.square(
+                    dimension: 52,
+                    child: Icon(
+                      Icons.settings_rounded,
+                      color: AppColors.ink,
+                      size: 24,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         );
       },
     );
@@ -986,6 +1095,92 @@ class _MountainOutlinePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _MountainOutlinePainter oldDelegate) => false;
+}
+
+/// Günlük challenge kartı — home ekranında başlık altında gösterilir.
+class _DailyChallengeCard extends StatelessWidget {
+  const _DailyChallengeCard({
+    required this.done,
+    required this.onTap,
+  });
+
+  final bool done;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      label: done ? 'Günlük challenge tamamlandı' : 'Günlük challenge',
+      button: !done,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: done ? null : onTap,
+          borderRadius: BorderRadius.circular(999),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(999),
+              gradient: LinearGradient(
+                colors: done
+                    ? const [Color(0xFF5A8F6A), Color(0xFF4A7B58)]
+                    : const [Color(0xFFFFD580), AppColors.gold, AppColors.goldDark],
+              ),
+              border: Border.all(
+                color: done ? const Color(0xFF8FBF9E) : const Color(0xFFFFF6D8),
+                width: 1.5,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: (done ? const Color(0x335A8F6A) : const Color(0x33000000))
+                      .withValues(alpha: 0.2),
+                  blurRadius: 12,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  done ? Icons.check_circle_rounded : Icons.star_rounded,
+                  color: done ? const Color(0xFFD4F0DA) : AppColors.ink,
+                  size: 22,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  done ? Strings.t('daily_challenge_done') : Strings.t('daily_challenge'),
+                  style: TextStyle(
+                    color: done ? const Color(0xFFD4F0DA) : AppColors.ink,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                if (!done) ...[
+                  const SizedBox(width: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: AppColors.ink.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: Text(
+                      '+${GameConfig.dailyChallengeBonus}',
+                      style: const TextStyle(
+                        color: AppColors.ink,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class _UnderlinePainter extends CustomPainter {

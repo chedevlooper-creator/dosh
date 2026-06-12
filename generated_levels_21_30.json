@@ -1,0 +1,334 @@
+[
+  {
+    "id": 21,
+    "letters": [
+      "б",
+      "е",
+      "л",
+      "а",
+      "р",
+      "г",
+      "т",
+      "е",
+      "т"
+    ],
+    "words": [
+      {
+        "word": "бел",
+        "row": 0,
+        "col": 0,
+        "dir": "across"
+      },
+      {
+        "word": "лерг",
+        "row": 0,
+        "col": 2,
+        "dir": "down"
+      },
+      {
+        "word": "бат",
+        "row": 4,
+        "col": 1,
+        "dir": "across"
+      },
+      {
+        "word": "етт",
+        "row": 1,
+        "col": 4,
+        "dir": "across"
+      }
+    ],
+    "bonus": [
+      "барт"
+    ]
+  },
+  {
+    "id": 22,
+    "letters": [
+      "к",
+      "е",
+      "м",
+      "а",
+      "о",
+      "х"
+    ],
+    "words": [
+      {
+        "word": "кема",
+        "row": 0,
+        "col": 0,
+        "dir": "across"
+      },
+      {
+        "word": "мох",
+        "row": 0,
+        "col": 2,
+        "dir": "down"
+      },
+      {
+        "word": "ма",
+        "row": 3,
+        "col": 2,
+        "dir": "across"
+      }
+    ],
+    "bonus": [
+      "мохк"
+    ]
+  },
+  {
+    "id": 23,
+    "letters": [
+      "н",
+      "е",
+      "х",
+      "ч",
+      "а",
+      "а"
+    ],
+    "words": [
+      {
+        "word": "нехча",
+        "row": 0,
+        "col": 0,
+        "dir": "across"
+      },
+      {
+        "word": "хен",
+        "row": 0,
+        "col": 2,
+        "dir": "down"
+      },
+      {
+        "word": "нах",
+        "row": 2,
+        "col": 2,
+        "dir": "across"
+      }
+    ],
+    "bonus": []
+  },
+  {
+    "id": 24,
+    "letters": [
+      "б",
+      "е",
+      "л",
+      "ш",
+      "о"
+    ],
+    "words": [
+      {
+        "word": "белш",
+        "row": 0,
+        "col": 0,
+        "dir": "across"
+      },
+      {
+        "word": "ло",
+        "row": 0,
+        "col": 2,
+        "dir": "down"
+      },
+      {
+        "word": "шо",
+        "row": 0,
+        "col": 3,
+        "dir": "down"
+      }
+    ],
+    "bonus": []
+  },
+  {
+    "id": 25,
+    "letters": [
+      "ш",
+      "а",
+      "д",
+      "у"
+    ],
+    "words": [
+      {
+        "word": "шад",
+        "row": 0,
+        "col": 0,
+        "dir": "across"
+      },
+      {
+        "word": "да",
+        "row": 0,
+        "col": 2,
+        "dir": "down"
+      },
+      {
+        "word": "шу",
+        "row": 1,
+        "col": 0,
+        "dir": "across"
+      }
+    ],
+    "bonus": []
+  },
+  {
+    "id": 26,
+    "letters": [
+      "гӏ",
+      "а",
+      "м",
+      "а",
+      "о",
+      "х"
+    ],
+    "words": [
+      {
+        "word": "гӏама",
+        "row": 0,
+        "col": 0,
+        "dir": "across"
+      },
+      {
+        "word": "мох",
+        "row": 0,
+        "col": 2,
+        "dir": "down"
+      },
+      {
+        "word": "ах",
+        "row": 0,
+        "col": 3,
+        "dir": "down"
+      }
+    ],
+    "bonus": [
+      "хаам"
+    ]
+  },
+  {
+    "id": 27,
+    "letters": [
+      "тӏ",
+      "у",
+      "л",
+      "г"
+    ],
+    "words": [
+      {
+        "word": "тӏулг",
+        "row": 0,
+        "col": 0,
+        "dir": "across"
+      },
+      {
+        "word": "гул",
+        "row": 1,
+        "col": 0,
+        "dir": "across"
+      },
+      {
+        "word": "лу",
+        "row": 2,
+        "col": 2,
+        "dir": "across"
+      }
+    ],
+    "bonus": []
+  },
+  {
+    "id": 28,
+    "letters": [
+      "л",
+      "а",
+      "т",
+      "о",
+      "а",
+      "т"
+    ],
+    "words": [
+      {
+        "word": "латта",
+        "row": 0,
+        "col": 0,
+        "dir": "across"
+      },
+      {
+        "word": "татол",
+        "row": 1,
+        "col": 0,
+        "dir": "across"
+      },
+      {
+        "word": "атта",
+        "row": 2,
+        "col": 2,
+        "dir": "across"
+      }
+    ],
+    "bonus": []
+  },
+  {
+    "id": 29,
+    "letters": [
+      "ч",
+      "а",
+      "й",
+      "л",
+      "о"
+    ],
+    "words": [
+      {
+        "word": "чай",
+        "row": 0,
+        "col": 0,
+        "dir": "across"
+      },
+      {
+        "word": "лай",
+        "row": 1,
+        "col": 0,
+        "dir": "across"
+      },
+      {
+        "word": "чо",
+        "row": 2,
+        "col": 0,
+        "dir": "across"
+      }
+    ],
+    "bonus": [
+      "ойла"
+    ]
+  },
+  {
+    "id": 30,
+    "letters": [
+      "хь",
+      "о",
+      "з",
+      "а",
+      "а",
+      "з",
+      "х"
+    ],
+    "words": [
+      {
+        "word": "хьоза",
+        "row": 0,
+        "col": 0,
+        "dir": "across"
+      },
+      {
+        "word": "заза",
+        "row": 0,
+        "col": 2,
+        "dir": "down"
+      },
+      {
+        "word": "хо",
+        "row": 1,
+        "col": 0,
+        "dir": "across"
+      }
+    ],
+    "bonus": []
+  }
+]

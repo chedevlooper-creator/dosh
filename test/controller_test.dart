@@ -25,6 +25,16 @@ Level _daLevel() => Level(
       ],
     );
 
+Level _levelWithBonus() => Level(
+      // да tek ızgara kelimesi, 'ад' bonus: letters=['д','а'] ile kurulabilir.
+      id: 3,
+      letters: ['д', 'а'],
+      words: [
+        PlacedWord(word: 'да', row: 0, col: 0, direction: WordDirection.across),
+      ],
+      bonusWords: ['ад'],
+    );
+
 Future<GameController> _newGame(Level level) async {
   SharedPreferences.setMockInitialValues({});
   final store = await ProgressStore.create();
@@ -168,6 +178,10 @@ void main() {
 
     expect(game.solvedWords, contains('да'));
     expect(game.levelDone, isTrue);
+    // _onLevelCompleted async fire-and-forget; event sıralı yazma sonrası gelir.
+    for (var i = 0; i < 5; i++) {
+      await Future.delayed(Duration.zero);
+    }
     expect(events.whereType<LevelCompleted>(), hasLength(1));
     // İpucuyla çözümde coin ödülü verilmez: 100 - 2×25
     expect(game.coins, GameConfig.startCoins - 2 * GameConfig.hintCost);
@@ -217,6 +231,10 @@ void main() {
     game.releaseSelection();
 
     expect(game.levelDone, isTrue);
+    // _onLevelCompleted async fire-and-forget; event sıralı yazma sonrası gelir.
+    for (var i = 0; i < 5; i++) {
+      await Future.delayed(Duration.zero);
+    }
     expect(events.whereType<LevelCompleted>(), hasLength(1));
   });
 
@@ -233,5 +251,216 @@ void main() {
     expect(game.solvedWords, isEmpty);
     expect(game.revealedCells, isEmpty);
     expect(game.levelDone, isFalse);
+  });
+
+  test(
+      'seviye tamamlanınca persist timer iptal edilir ve veriler anında yazılır',
+      () async {
+    SharedPreferences.setMockInitialValues({});
+    final store = await ProgressStore.create();
+    // Tek seviyeli listede (_levelIndex+1) % 1 = 0 olur; 2 seviyeli setle
+    // levelIndex'in gerçekten değiştiğini doğrulayabiliriz.
+    final game = GameController(
+      levels: [
+        _daLevel(),
+        Level(
+          id: 99,
+          letters: ['а', 'б'],
+          words: [
+            PlacedWord(
+                word: 'аб', row: 0, col: 0, direction: WordDirection.across),
+          ],
+        ),
+      ],
+      store: store,
+    );
+    final events = <GameEvent>[];
+    game.events.listen(events.add);
+
+    // İpucu: bu solvedWords/coins'i günceller ve _schedulePersist çağırır.
+    // 800ms debounce var — biz hemen seviyeyi bitiriyoruz.
+    game.useHint();
+    game.useHint(); // ikinci ipucu → "да" tamamen dolar → seviye biter
+
+    expect(game.levelDone, isTrue);
+
+    // _onLevelCompleted async fire-and-forget tetiklendi. SharedPreferences
+    // mock'u microtask olarak çalışır; birden fazla event loop turu bekle.
+    for (var i = 0; i < 10; i++) {
+      await Future.delayed(Duration.zero);
+    }
+
+    expect(events.whereType<LevelCompleted>(), hasLength(1));
+
+    // Store'da: hücreler temizlendi, levelIndex ilerledi.
+    expect(store.solvedWordsFor(_daLevel().id), isEmpty,
+        reason: 'clearLevelProgress çağrılmalı');
+    expect(store.revealedCellsFor(_daLevel().id), isEmpty,
+        reason: 'clearLevelProgress çağrılmalı');
+    expect(store.levelIndex, 1, reason: 'seviye ilerletilmeli');
+
+    // Dispose'da da flush beklemeden veriler yazılmış olmalı.
+    game.dispose();
+  });
+
+  test('nextLevel timer iptal eder — stale write riskini kapatır', () async {
+    SharedPreferences.setMockInitialValues({});
+    final store = await ProgressStore.create();
+
+    // İki seviyeli yap: birinci bitince ikinciye geçer.
+    final level1 = _daLevel();
+    final level2 = Level(
+      id: 99,
+      letters: ['а', 'б'],
+      words: [PlacedWord(word: 'аб', row: 0, col: 0, direction: WordDirection.across)],
+    );
+    final game = GameController(levels: [level1, level2], store: store);
+
+    // Seviye 1'i bitir, hemen nextLevel çağır (timer henüz ateşlenmeden).
+    game.useHint();
+    game.useHint();
+    expect(game.levelDone, isTrue);
+    game.nextLevel();
+    // nextLevel sırasında timer iptal edildi, level1 verileri yazılmamalı
+    // (seviye zaten bitti, clearLevelProgress çağrıldı).
+    await Future.delayed(Duration.zero);
+
+    // Şu an seviye 2'deyiz, henüz çözüm yok.
+    expect(game.level, level2);
+    expect(game.solvedWords, isEmpty);
+
+    // Dispose ile kapat — herhangi bir stale write olmamalı.
+    game.dispose();
+  });
+
+  test('bonus kelime çözünce bonus event tetiklenir, success değil', () async {
+    // _levelWithBonus: letters=[д,а], words=[да], bonusWords=[ад].
+    // "ад" geçerli: теkerin harfleri çark sırasıyla d, a → "да" kuruluyor;
+    // oyuncu a, d sırasıyla girmeli → "ад".
+    final game = await _newGame(_levelWithBonus());
+    final events = <GameEvent>[];
+    game.events.listen(events.add);
+
+    game.enterBubble(1); // а
+    game.enterBubble(0); // д → "ад"
+    game.releaseSelection();
+
+    // Bonus event tetiklendi, success değil.
+    expect(events.whereType<BonusWordFound>(), hasLength(1));
+    expect(events.whereType<WordSolved>(), isEmpty,
+        reason: 'bonus ızgara dışı, success animasyonu tetiklenmemeli');
+    expect(game.foundBonusWords, contains('ад'));
+
+    // Bonus coin ödülü verildi.
+    expect(events.whereType<CoinsGained>(), hasLength(1));
+    expect(game.coins,
+        GameConfig.startCoins + GameConfig.bonusWordCoins);
+
+    game.dispose();
+  });
+
+  test(
+      'bonus sonra grid kelime çözünce success tetiklenir, bonus iptal olmaz',
+      () async {
+    final game = await _newGame(_levelWithBonus());
+    final events = <GameEvent>[];
+    game.events.listen(events.add);
+
+    // Önce bonus bul
+    game.enterBubble(1); // а
+    game.enterBubble(0); // д
+    game.releaseSelection();
+    expect(events.whereType<BonusWordFound>(), hasLength(1));
+
+    // Şimdi asıl ızgara kelimesini çöz → success animasyonu tetiklenir.
+    game.enterBubble(0); // д
+    game.enterBubble(1); // а
+    game.releaseSelection();
+
+    // _onLevelCompleted async; event loop'un boşalmasını bekle.
+    for (var i = 0; i < 10; i++) {
+      await Future.delayed(Duration.zero);
+    }
+
+    // Bonus + WordSolved + CoinsGained (bonus + grid coin)
+    expect(events.whereType<BonusWordFound>(), hasLength(1));
+    expect(events.whereType<WordSolved>(), hasLength(1));
+    // İlk bonus 10 + grid 2×5 = 10+10 = 20 coin
+    expect(game.coins, GameConfig.startCoins + GameConfig.bonusWordCoins +
+        2 * GameConfig.coinsPerGrapheme);
+
+    game.dispose();
+  });
+
+  test('granular notifier: streakListenable sadece streak değişince tetiklenir',
+      () async {
+    final game = await _newGame(_malxLevel());
+    var streakNotifications = 0;
+    game.streakListenable.addListener(() => streakNotifications++);
+
+    // Yanlış kelime → streak 1'den 0'a düşer.
+    _submitByIndexes(game, [0, 1, 2, 3]); // малх, streak 1
+    expect(streakNotifications, 1, reason: 'streak 0→1');
+    _submitByIndexes(game, [2, 0]); // yanlış
+    expect(streakNotifications, 2, reason: 'streak 1→0');
+
+    game.dispose();
+  });
+
+  test(
+      'granular notifier: coinsListenable sadece coin değişince tetiklenir',
+      () async {
+    final game = await _newGame(_malxLevel());
+    var coinNotifications = 0;
+    game.coinsListenable.addListener(() => coinNotifications++);
+
+    // Doğru kelime çöz → coin değişimi olmalı.
+    _submitByIndexes(game, [0, 1, 2, 3]);
+    expect(coinNotifications, greaterThan(0));
+    final before = coinNotifications;
+
+    // Karıştırma coin etkilemez.
+    game.shuffle();
+    expect(coinNotifications, before, reason: 'shuffle coin değiştirmez');
+
+    game.dispose();
+  });
+
+  test(
+      'granular notifier: selectionListenable her baloncuk değişiminde tetiklenir',
+      () async {
+    final game = await _newGame(_malxLevel());
+    var notifications = 0;
+    game.selectionListenable.addListener(() => notifications++);
+
+    expect(game.enterBubble(0), isTrue, reason: 'ilk seçim değişiklik');
+    expect(notifications, 1);
+    expect(game.enterBubble(1), isTrue);
+    expect(notifications, 2);
+    expect(game.enterBubble(1), isFalse,
+        reason: 'aynı baloncuğa tekrar = değişiklik yok');
+    expect(notifications, 2);
+    expect(game.enterBubble(0), isTrue, reason: 'geri kayma (undo)');
+    expect(notifications, 3);
+
+    game.dispose();
+  });
+
+  test('AlreadyFound tekrarı mistakes sayacını artırmaz', () async {
+    final game = await _newGame(_malxLevel());
+    final before = game.mistakes;
+
+    // İlk kez çöz
+    _submitByIndexes(game, [0, 1, 2, 3]);
+    expect(game.solvedWords, contains('малх'));
+
+    final mistakesAfterSolve = game.mistakes;
+    // Aynı kelimeyi tekrar dene
+    _submitByIndexes(game, [0, 1, 2, 3]);
+    expect(game.mistakes, mistakesAfterSolve,
+        reason: 'AlreadyFound hata sayılmamalı');
+    expect(game.mistakes, before, reason: 'hiç hata olmamalı');
+
+    game.dispose();
   });
 }

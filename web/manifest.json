@@ -1,11 +1,11 @@
 {
-    "name": "dosh",
-    "short_name": "dosh",
+    "name": "Дош — Çeçence Kelime Bulmaca",
+    "short_name": "Дош",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#F5B62B",
+    "theme_color": "#F5B62B",
+    "description": "Çeçence (Нохчийн мотт) kelime bulmaca oyunu. Harf çarkından kelimeleri bularak çengel bulmacayı tamamla.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

@@ -16,7 +16,7 @@ class RoundIconButton extends StatefulWidget {
     this.badge,
     this.enabled = true,
     this.pulse = false,
-  });
+  }) : assert(size >= 44, 'Touch target en az 44dp olmalı (Apple HIG)');
 
   final IconData icon;
   final VoidCallback? onTap;

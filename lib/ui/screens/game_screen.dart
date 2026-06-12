@@ -20,6 +20,7 @@ import '../widgets/level_complete_panel.dart';
 import '../widgets/round_icon_button.dart';
 import '../widgets/scenic_background.dart';
 import '../widgets/top_bar.dart';
+import '../widgets/tutorial_guide.dart';
 import '../widgets/word_capsule.dart';
 
 /// Ana oyun ekranı: arka plan, üst bar, crossword, kelime kapsülü, harf
@@ -30,13 +31,27 @@ class GameScreen extends StatefulWidget {
     required this.levels,
     required this.store,
     required this.sound,
+    required this.theme,
     this.onHome,
+    this.startIndex = 0,
+    this.isDailyChallenge = false,
+    this.onTutorialComplete,
   });
 
   final List<Level> levels;
   final ProgressStore store;
   final GameSound sound;
+  final SceneTheme theme;
   final VoidCallback? onHome;
+
+  /// Galeriden seçilen seviye indeksi. 0 ise store.levelIndex kullanılır.
+  final int startIndex;
+
+  /// Günlük challenge modu: bitince ana sayfaya dön + bonus coin.
+  final bool isDailyChallenge;
+
+  /// Tutorial tamamlandığında çağrılır (yalnızca seviye 0 için).
+  final VoidCallback? onTutorialComplete;
 
   @override
   State<GameScreen> createState() => _GameScreenState();
@@ -48,6 +63,7 @@ class _GameScreenState extends State<GameScreen> {
 
   int _shakeTick = 0;
   int _successTick = 0;
+  int _bonusTick = 0;
   String _successWord = '';
   int _gainTick = 0;
   int _lastGain = 0;
@@ -57,6 +73,7 @@ class _GameScreenState extends State<GameScreen> {
   int _confettiTick = 0;
   int _levelEarned = 0;
   bool _showComplete = false;
+  bool _challengeBonusApplied = false;
   Timer? _advanceTimer;
 
   /// Son bulunan bonus kelime — alt bilgi şeridinde açıklaması gösterilir;
@@ -66,7 +83,11 @@ class _GameScreenState extends State<GameScreen> {
   @override
   void initState() {
     super.initState();
-    _game = GameController(levels: widget.levels, store: widget.store);
+    _game = GameController(
+      levels: widget.levels,
+      store: widget.store,
+      startIndex: widget.startIndex,
+    );
     _eventSub = _game.events.listen(_onGameEvent);
   }
 
@@ -88,7 +109,9 @@ class _GameScreenState extends State<GameScreen> {
         widget.sound.play(SoundCue.solve);
         HapticFeedback.lightImpact();
         setState(() {
-          _successTick++;
+          // Bonus kelime: success animasyonu YOK (kapsül hâlâ seçimde
+          // gösterilecek), sadece bonus-specific altın pulse tetiklenir.
+          _bonusTick++;
           _successWord = word.toUpperCase();
           _lastBonusWord = word;
         });
@@ -110,12 +133,26 @@ class _GameScreenState extends State<GameScreen> {
         widget.sound.play(SoundCue.complete);
         HapticFeedback.heavyImpact();
         setState(() => _confettiTick++);
-        // Harfler yerleşip konfeti başladıktan sonra kutlama paneli açılır;
-        // oyuncu "Devam" diyene kadar bekler (otomatik geçiş yok).
-        _advanceTimer?.cancel();
-        _advanceTimer = Timer(const Duration(milliseconds: 900), () {
-          if (mounted) setState(() => _showComplete = true);
-        });
+        if (_game.level.id == 0) {
+          // Tutorial seviyesi: LevelCompletePanel gösterilmez,
+          // TutorialGuide "tamamlama" adımını kendisi yönetir.
+        } else {
+          if (widget.isDailyChallenge && !_challengeBonusApplied) {
+            _challengeBonusApplied = true;
+            final bonus = GameConfig.dailyChallengeBonus;
+            _levelEarned += bonus;
+            final newCoins = _game.coins + bonus;
+            _game.coinsListenable.value = newCoins;
+            unawaited(widget.store.setCoins(newCoins));
+            unawaited(widget.store.markDailyChallengeDone());
+          }
+          // Normal seviye: harfler yerleşip konfeti başladıktan sonra
+          // kutlama paneli açılır.
+          _advanceTimer?.cancel();
+          _advanceTimer = Timer(const Duration(milliseconds: 900), () {
+            if (mounted) setState(() => _showComplete = true);
+          });
+        }
       case HintRevealed():
         widget.sound.play(SoundCue.hint);
       case AlreadyFound():
@@ -126,20 +163,10 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void _enterBubble(int letterIndex) {
-    final before = List<int>.from(_game.selection);
-    _game.enterBubble(letterIndex);
-    if (!_sameSelection(before, _game.selection)) {
+    if (_game.enterBubble(letterIndex)) {
       widget.sound.play(SoundCue.tap);
       HapticFeedback.selectionClick();
     }
-  }
-
-  bool _sameSelection(List<int> a, List<int> b) {
-    if (a.length != b.length) return false;
-    for (var i = 0; i < a.length; i++) {
-      if (a[i] != b[i]) return false;
-    }
-    return true;
   }
 
   void _shuffle() {
@@ -162,7 +189,7 @@ class _GameScreenState extends State<GameScreen> {
         fit: StackFit.expand,
         children: [
           // Arka plan tüm pencereye yayılır (geniş ekranda da).
-          const ScenicBackground(showPlayArea: false),
+          ScenicBackground(showPlayArea: false, theme: widget.theme),
           const Positioned.fill(child: _GameLightOverlay()),
           SafeArea(
             child: LayoutBuilder(
@@ -182,6 +209,15 @@ class _GameScreenState extends State<GameScreen> {
             ),
           ),
           Positioned.fill(child: ConfettiBurst(trigger: _confettiTick)),
+          // Tutorial rehberi (seviye 0)
+          if (_game.level.id == 0)
+            Positioned.fill(
+              child: TutorialGuide(
+                controller: _game,
+                onComplete: widget.onTutorialComplete ?? () {},
+                onSkip: widget.onTutorialComplete ?? () {},
+              ),
+            ),
           Positioned.fill(
             child: _ComboBonusBurst(
               trigger: _comboTick,
@@ -205,6 +241,16 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void _continueNext() {
+    if (_game.level.id == 0) {
+      // Tutorial seviyesi tamamlandı — dışarıya bildir.
+      widget.onTutorialComplete?.call();
+      return;
+    }
+    if (widget.isDailyChallenge) {
+      // Günlük challenge: ana sayfaya dön.
+      widget.onHome?.call();
+      return;
+    }
     widget.sound.play(SoundCue.tap);
     setState(() {
       _showComplete = false;
@@ -240,7 +286,11 @@ class _GameScreenState extends State<GameScreen> {
           ),
         ),
         const SizedBox(height: 2),
-        _StreakMeter(streak: _game.streak),
+        // Sadece streak değiştiğinde rebuild olur (granüler dinleme).
+        ListenableBuilder(
+          listenable: _game.streakListenable,
+          builder: (context, _) => _StreakMeter(streak: _game.streak),
+        ),
         Expanded(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
@@ -257,11 +307,16 @@ class _GameScreenState extends State<GameScreen> {
             ),
           ),
         ),
-        WordCapsule(
-          text: _game.currentWord.toUpperCase(),
-          shakeTick: _shakeTick,
-          successTick: _successTick,
-          successText: _successWord,
+        // Sadece seçim değiştiğinde rebuild olur (granüler dinleme).
+        ListenableBuilder(
+          listenable: _game.selectionListenable,
+          builder: (context, _) => WordCapsule(
+            text: _game.currentWord.toUpperCase(),
+            shakeTick: _shakeTick,
+            successTick: _successTick,
+            bonusTick: _bonusTick,
+            successText: _successWord,
+          ),
         ),
         const SizedBox(height: 6),
         Row(
@@ -307,10 +362,14 @@ class _GameScreenState extends State<GameScreen> {
             children: [
               Expanded(child: InfoStrip(text: infoText)),
               const SizedBox(width: 10),
-              CoinBox(
-                coins: _game.coins,
-                gainTick: _gainTick,
-                lastGain: _lastGain,
+              // Sadece coin değiştiğinde rebuild olur (granüler dinleme).
+              ListenableBuilder(
+                listenable: _game.coinsListenable,
+                builder: (context, _) => CoinBox(
+                  coins: _game.coins,
+                  gainTick: _gainTick,
+                  lastGain: _lastGain,
+                ),
               ),
             ],
           ),

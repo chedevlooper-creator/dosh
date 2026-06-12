@@ -19,7 +19,10 @@ Level _malxLevel() => Level(
     );
 
 Future<ProgressStore> _freshStore() async {
-  SharedPreferences.setMockInitialValues({'sound_on': false});
+  SharedPreferences.setMockInitialValues({
+    'sound_on': false,
+    'tutorial_done': true, // Tutorial tamamlandı olarak işaretle (normal akış)
+  });
   return ProgressStore.create();
 }
 
@@ -35,7 +38,17 @@ Future<void> _pumpAndStartGame(WidgetTester tester, ProgressStore store) async {
   expect(find.text('Дош'), findsOneWidget);
   expect(find.text('ДӀадоладе'), findsOneWidget);
 
+  // Yeni akış: ana ekran → galeri → seviye seç → oyun.
   await tester.tap(find.byKey(const ValueKey('home_play')));
+  await tester.pump();
+  await tester.pump(const Duration(milliseconds: 500));
+
+  // Galeride ilk seviye (id=1) görünür, ona tıkla.
+  final levelTile = find.byWidgetPredicate(
+    (w) => w is Semantics && w.properties.label.toString().contains('Seviye 1'),
+  );
+  expect(levelTile, findsOneWidget);
+  await tester.tap(levelTile);
   await tester.pump();
   await tester.pump(const Duration(milliseconds: 500));
 }

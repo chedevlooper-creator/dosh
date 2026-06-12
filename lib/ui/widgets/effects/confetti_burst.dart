@@ -22,14 +22,24 @@ class _ConfettiBurstState extends State<ConfettiBurst>
     duration: const Duration(milliseconds: 1900),
   );
 
-  List<_Particle> _particles = const [];
+  // Partiküller ilk oluşturulmada bir kere allocate edilir; sonraki
+  // trigger'larda sadece controller reset olur. GC baskısı azalır.
+  late final List<_Particle> _particles;
+
+  @override
+  void initState() {
+    super.initState();
+    // Sabit seed: her widget instance'ı aynı parçacık kümesini kullanır
+    // ama kullanıcıya aynı görsel ritim sunar. Çeşitlilik gerekiyorsa
+    // trigger'ı seed olarak kullanabiliriz (ama allocation yapar).
+    final random = Random(42);
+    _particles = List.generate(90, (_) => _Particle.random(random));
+  }
 
   @override
   void didUpdateWidget(covariant ConfettiBurst oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.trigger != oldWidget.trigger && widget.trigger > 0) {
-      final random = Random(widget.trigger * 9973);
-      _particles = List.generate(90, (_) => _Particle.random(random));
       _ctrl.forward(from: 0);
     }
   }

@@ -52,6 +52,7 @@ class CrosswordGrid extends StatelessWidget {
               children: [
                 for (final entry in level.targetByCell.entries)
                   Positioned(
+                    key: ValueKey('cell_${entry.key.row}_${entry.key.col}'),
                     left: (entry.key.col - level.minCol) * (cell + gap),
                     top: (entry.key.row - level.minRow) * (cell + gap),
                     child: _LetterCell(
@@ -143,49 +144,56 @@ class _LetterCellState extends State<_LetterCell>
     final visible = widget.show;
     final solved = widget.solved;
 
-    return AnimatedContainer(
-      duration: AppMotion.base,
-      width: widget.size,
-      height: widget.size,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(widget.size * 0.18),
-        gradient: visible && solved
-            ? const LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [AppColors.goldLight, AppColors.gold],
+    return Semantics(
+      label: visible
+          ? 'Harf ${widget.letter}, satır ${(widget.size * 0).toInt() + 1}, '
+              '${solved ? "çözüldü" : "ipucu"}'
+          : 'Boş hücre',
+      container: true,
+      child: ExcludeSemantics(
+        child: AnimatedContainer(
+        duration: AppMotion.base,
+        width: widget.size,
+        height: widget.size,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(widget.size * 0.18),
+          gradient: visible && solved
+              ? const LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [AppColors.goldLight, AppColors.gold],
+                )
+              : null,
+          color: visible && solved ? null : AppColors.cellEmpty,
+          // İnce ışık konturu: hücreleri yoğun fotoğraf üzerinde tanımlar.
+          border: visible && solved
+              ? null
+              : Border.all(color: const Color(0x2EFFFFFF), width: 1),
+          boxShadow: [
+            if (visible && solved)
+              const BoxShadow(
+                color: Color(0x59D9961A),
+                blurRadius: 10,
+                offset: Offset(0, 3),
               )
-            : null,
-        color: visible && solved ? null : AppColors.cellEmpty,
-        // İnce ışık konturu: hücreleri yoğun fotoğraf üzerinde tanımlar.
-        border: visible && solved
-            ? null
-            : Border.all(color: const Color(0x2EFFFFFF), width: 1),
-        boxShadow: [
-          if (visible && solved)
-            const BoxShadow(
-              color: Color(0x59D9961A),
-              blurRadius: 10,
-              offset: Offset(0, 3),
-            )
-          else
-            const BoxShadow(
-              color: Color(0x26000000),
-              blurRadius: 5,
-              offset: Offset(0, 2),
-            ),
-        ],
-      ),
-      child: visible
-          ? AnimatedBuilder(
-              animation: _pop,
-              builder: (context, _) {
-                final pop = Curves.easeOutBack.transform(_pop.value);
-                return Stack(
-                  clipBehavior: Clip.none,
-                  fit: StackFit.expand,
-                  children: [
-                    // Altın kıvılcımlar: harf yerleşirken dışa saçılır
+            else
+              const BoxShadow(
+                color: Color(0x26000000),
+                blurRadius: 5,
+                offset: Offset(0, 2),
+              ),
+          ],
+        ),
+        child: visible
+            ? AnimatedBuilder(
+                animation: _pop,
+                builder: (context, _) {
+                  final pop = Curves.easeOutBack.transform(_pop.value);
+                  return Stack(
+                    clipBehavior: Clip.none,
+                    fit: StackFit.expand,
+                    children: [
+                      // Altın kıvılcımlar: harf yerleşirken dışa saçılır
                     if (solved && _pop.isAnimating)
                       CustomPaint(
                         painter: _SparklePainter(progress: _pop.value),
@@ -216,6 +224,8 @@ class _LetterCellState extends State<_LetterCell>
               },
             )
           : null,
+      ),
+      ),
     );
   }
 }

@@ -78,8 +78,14 @@ class GameSound extends ChangeNotifier {
     await _store.setSoundOn(_enabled);
     if (_enabled) {
       play(SoundCue.tap);
-      if (_homeAmbienceRequested) startHomeAmbience();
+      // Kullanıcı o anda home'daysa ambience tekrar başlasın; oyun
+      // ekranındaysa home'a dönünce zaten startHomeAmbience çağrılacak.
+      if (_homeAmbienceRequested) {
+        startHomeAmbience();
+      }
     } else {
+      // Ses kapatılınca ambience de durmalı — _playHomeAmbience içindeki
+      // !_enabled guard'ı sayesinde yarış durumu oluşmaz.
       _homeAmbiencePlaying = false;
       final player = _homeAmbience;
       if (player != null) await player.stop();
@@ -104,11 +110,17 @@ class GameSound extends ChangeNotifier {
     final player = _homeAmbience ??= AudioPlayer(playerId: 'home_ambience');
     try {
       await player.setReleaseMode(ReleaseMode.loop);
-      if (!_enabled || !_homeAmbienceRequested) return;
+      // Play öncesi tekrar kontrol: toggle ile ses kapatılmış veya
+      // stopHomeAmbience çağrılmış olabilir — yarış koşulunu önle.
+      if (!_enabled || !_homeAmbienceRequested) {
+        _homeAmbiencePlaying = false;
+        return;
+      }
       await player.play(
         AssetSource('audio/birds.wav'),
         volume: 0.16,
       );
+      // Play sonrası tekrar kontrol: play() sırasında toggle edilmiş olabilir.
       if (_enabled && _homeAmbienceRequested) {
         _homeAmbiencePlaying = true;
       } else {
