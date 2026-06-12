@@ -1,7 +1,7 @@
 name: dosh
-description: "Çeçence kelime bulmaca oyunu (Дош)."
+description: "Дош — Çeçen dilinde premium kelime bulmaca macerası."
 publish_to: 'none'
-version: 1.0.0
+version: 1.0.0+1
 
 environment:
   sdk: ^3.5.0
@@ -33,6 +33,11 @@ flutter:
       fonts:
         - asset: assets/fonts/NotoSans-Regular.ttf
         - asset: assets/fonts/NotoSans-Bold.ttf
+          weight: 700
+    - family: PTSerif
+      fonts:
+        - asset: assets/fonts/PTSerif-Regular.ttf
+        - asset: assets/fonts/PTSerif-Bold.ttf
           weight: 700
 
 flutter_launcher_icons:

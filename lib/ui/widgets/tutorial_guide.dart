@@ -38,7 +38,7 @@ class TutorialGuide extends StatefulWidget {
 }
 
 class _TutorialGuideState extends State<TutorialGuide>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   _TutorialStep _step = _TutorialStep.welcome;
   StreamSubscription<GameEvent>? _eventSub;
   late final AnimationController _pulseCtrl;
@@ -625,25 +625,28 @@ class _TutorialCard extends StatelessWidget {
                   ),
                 ],
               ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    label,
-                    style: const TextStyle(
-                      fontFamily: AppText.displayFamily,
-                      color: AppColors.ink,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      label,
+                      style: const TextStyle(
+                        fontFamily: AppText.displayFamily,
+                        color: AppColors.ink,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  const Icon(
-                    Icons.arrow_forward_rounded,
-                    color: AppColors.ink,
-                    size: 20,
-                  ),
-                ],
+                    const SizedBox(width: 8),
+                    const Icon(
+                      Icons.arrow_forward_rounded,
+                      color: AppColors.ink,
+                      size: 20,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

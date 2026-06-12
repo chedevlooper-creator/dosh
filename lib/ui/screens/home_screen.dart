@@ -180,7 +180,7 @@ class _GiftClaimBurst extends StatefulWidget {
 }
 
 class _GiftClaimBurstState extends State<_GiftClaimBurst>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 920),
@@ -283,7 +283,7 @@ class _FlyingBirds extends StatefulWidget {
 }
 
 class _FlyingBirdsState extends State<_FlyingBirds>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
     vsync: this,
     duration: const Duration(seconds: 28),
@@ -453,11 +453,11 @@ class _GiftPill extends StatelessWidget {
             clipBehavior: Clip.none,
             children: [
               const SizedBox.square(
-                dimension: 52,
+                dimension: 44,
                 child: Icon(
                   Icons.card_giftcard_rounded,
                   color: AppColors.ink,
-                  size: 24,
+                  size: 22,
                 ),
               ),
               if (available)
@@ -532,20 +532,20 @@ class _SoundPill extends StatelessWidget {
                     customBorder: const CircleBorder(),
                     onTap: sound.toggle,
                     child: SizedBox.square(
-                      dimension: 52,
+                      dimension: 44,
                       child: Icon(
                         sound.enabled
                             ? Icons.volume_up_rounded
                             : Icons.volume_off_rounded,
                         color: AppColors.ink,
-                        size: 25,
+                        size: 22,
                       ),
                     ),
                   ),
                 ),
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 6),
             Semantics(
               label: 'İstatistik',
               button: true,
@@ -560,17 +560,17 @@ class _SoundPill extends StatelessWidget {
                   customBorder: const CircleBorder(),
                   onTap: onStats,
                   child: const SizedBox.square(
-                    dimension: 52,
+                    dimension: 44,
                     child: Icon(
                       Icons.bar_chart_rounded,
                       color: AppColors.ink,
-                      size: 24,
+                      size: 22,
                     ),
                   ),
                 ),
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 6),
             Semantics(
               label: 'Sözlük',
               button: true,
@@ -585,17 +585,17 @@ class _SoundPill extends StatelessWidget {
                   customBorder: const CircleBorder(),
                   onTap: onDictionary,
                   child: const SizedBox.square(
-                    dimension: 52,
+                    dimension: 44,
                     child: Icon(
                       Icons.menu_book_rounded,
                       color: AppColors.ink,
-                      size: 24,
+                      size: 22,
                     ),
                   ),
                 ),
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 6),
             Semantics(
               label: 'Ayarlar',
               button: true,
@@ -610,11 +610,11 @@ class _SoundPill extends StatelessWidget {
                   customBorder: const CircleBorder(),
                   onTap: onSettings,
                   child: const SizedBox.square(
-                    dimension: 52,
+                    dimension: 44,
                     child: Icon(
                       Icons.settings_rounded,
                       color: AppColors.ink,
-                      size: 24,
+                      size: 22,
                     ),
                   ),
                 ),

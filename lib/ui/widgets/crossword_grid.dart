@@ -107,7 +107,7 @@ class _LetterCell extends StatefulWidget {
 }
 
 class _LetterCellState extends State<_LetterCell>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   // Her zaman initState'te oluşturulur: gizli hücrelerde ilk erişim dispose()
   // sırasında olursa late başlatıcı deaktive ağaçta vsync araması yapar ve
   // "deactivated widget's ancestor" hatası fırlatır.

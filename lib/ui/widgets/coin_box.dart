@@ -23,7 +23,7 @@ class CoinBox extends StatefulWidget {
 }
 
 class _CoinBoxState extends State<CoinBox>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late final AnimationController _pulse = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 750),

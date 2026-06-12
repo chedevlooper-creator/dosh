@@ -40,7 +40,7 @@ class LetterWheel extends StatefulWidget {
 }
 
 class _LetterWheelState extends State<LetterWheel>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late final AnimationController _shuffleCtrl = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 480),

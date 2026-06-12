@@ -16,7 +16,7 @@ class ConfettiBurst extends StatefulWidget {
 }
 
 class _ConfettiBurstState extends State<ConfettiBurst>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late final AnimationController _ctrl = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 1900),

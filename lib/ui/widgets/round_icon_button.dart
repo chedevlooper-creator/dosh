@@ -30,7 +30,7 @@ class RoundIconButton extends StatefulWidget {
 }
 
 class _RoundIconButtonState extends State<RoundIconButton>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   bool _hovered = false;
   bool _pressed = false;
   AnimationController? _pulseCtrl;

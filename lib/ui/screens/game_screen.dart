@@ -479,7 +479,7 @@ class _ComboBonusBurst extends StatefulWidget {
 }
 
 class _ComboBonusBurstState extends State<_ComboBonusBurst>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 980),
@@ -602,7 +602,7 @@ class _SolveAura extends StatefulWidget {
 }
 
 class _SolveAuraState extends State<_SolveAura>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 760),

@@ -440,7 +440,7 @@ class _ResetTileState extends State<_ResetTile> {
         // Tema varsayılana döndü — üst state'i de güncelle
         widget.onThemeChanged?.call(0);
         HapticFeedback.heavyImpact();
-        if (mounted) {
+        if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(Strings.t('settings_reset_done')),

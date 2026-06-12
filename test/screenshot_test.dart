@@ -52,13 +52,9 @@ void main() {
       await tester.pumpWidget(DoshApp(levels: levels!, store: store));
       await tester.pump();
 
-      // Arka plan fotoğrafının çözülmesini bekle (golden'da boş kalmasın)
-      await tester.runAsync(
-        () => precacheImage(
-          const AssetImage('assets/backgrounds/caucasus.png'),
-          tester.element(find.byType(MaterialApp)),
-        ),
-      );
+      // Sahne arka planı için ekstra frame: CustomPainter'lar ilk geçişte
+      // dağları, kartalı ve kuşları çizer; oyun-motoru animasyonlarının
+      // (uçan kuşlar, hediye partikülleri) sabit bir karesini yakalayalım.
       await tester.pump(const Duration(milliseconds: 700));
 
       await expectLater(
