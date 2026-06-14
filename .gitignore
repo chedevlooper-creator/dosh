@@ -49,3 +49,4 @@ setup_log.txt
 test_log.txt
 git_log.txt
 test/goldens/
+.env
