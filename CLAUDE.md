@@ -196,3 +196,17 @@ Edit `assets/levels/levels.json`. Each level:
 - Develop on the designated feature branch; create it locally if needed.
 - Commit with clear messages; push with `git push -u origin <branch>`.
 - Do **not** open a pull request unless explicitly asked.
+
+## Release / publishing
+
+See **`YAYIN_REHBERI.md`** for the full store-publishing playbook and
+**`GIZLILIK.md`** for the privacy policy (the app collects no data).
+
+- App is branded **Дош** on every platform; version lives in `pubspec.yaml`
+  (`1.0.0+1`) — bump the `+build` on each release.
+- Android release signing reads `android/key.properties` →
+  `android/app/upload-keystore.jks` (both **gitignored**, kept local only).
+  Without them the release build falls back to the debug key (not store-uploadable).
+  **The keystore must be backed up** — losing it blocks all future Play updates.
+- `flutter build appbundle --release` (needs Android SDK), `flutter build ipa`
+  (needs macOS/Xcode + an Apple team), `flutter build windows --release` (works here).
