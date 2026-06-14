@@ -28,7 +28,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
   Win32Window::Point origin(10, 10);
   // Dikey oyun ekranı: telefon oranına yakın varsayılan pencere.
   Win32Window::Size size(480, 860);
-  if (!window.Create(L"dosh", origin, size)) {
+  if (!window.Create(L"Дош", origin, size)) {
     return EXIT_FAILURE;
   }
   window.SetQuitOnClose(true);

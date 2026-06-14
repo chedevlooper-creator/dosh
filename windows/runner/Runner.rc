@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.dosh" "\0"
-            VALUE "FileDescription", "dosh" "\0"
+            VALUE "CompanyName", "Dosh" "\0"
+            VALUE "FileDescription", "Дош — Çeçence kelime bulmaca oyunu" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "dosh" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2026 com.dosh. All rights reserved." "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2026 Dosh. All rights reserved." "\0"
             VALUE "OriginalFilename", "dosh.exe" "\0"
-            VALUE "ProductName", "dosh" "\0"
+            VALUE "ProductName", "Дош" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

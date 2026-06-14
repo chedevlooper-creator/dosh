@@ -2,6 +2,7 @@ import 'package:dosh/app.dart';
 import 'package:dosh/core/strings.dart';
 import 'package:dosh/data/level_repository.dart';
 import 'package:dosh/data/progress_store.dart';
+import 'package:dosh/ui/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -19,13 +20,28 @@ const bool _capture = bool.fromEnvironment('GOLDEN');
 Future<void> _loadFonts() async {
   final regular = await rootBundle.load('assets/fonts/NotoSans-Regular.ttf');
   final bold = await rootBundle.load('assets/fonts/NotoSans-Bold.ttf');
-  // Georgia test ortamında yoktur; ekran görüntüsünde kutu (Ahem) yerine
-  // gerçek glif görmek için aynı dosyaları her iki aile adına da yükleriz.
+  final serif = await rootBundle.load('assets/fonts/PTSerif-Regular.ttf');
+  final serifBold = await rootBundle.load('assets/fonts/PTSerif-Bold.ttf');
+
+  // NotoSans (gövde) + Georgia eski takma adı (geriye dönük uyumluluk).
   for (final family in ['NotoSans', 'Georgia']) {
     final loader = FontLoader(family)
       ..addFont(Future.value(regular))
       ..addFont(Future.value(bold));
     await loader.load();
+  }
+  // PT Serif (başlık display fontu) — golden'da gerçek serif glifleri görünsün.
+  await (FontLoader(AppText.displayFamily)
+        ..addFont(Future.value(serif))
+        ..addFont(Future.value(serifBold)))
+      .load();
+  // MaterialIcons: uses-material-design ile uygulama paketine eklenir;
+  // ikonlar kutu yerine gerçek glifle çıksın diye yüklenir (bulunamazsa atla).
+  try {
+    final icons = await rootBundle.load('fonts/MaterialIcons-Regular.otf');
+    await (FontLoader('MaterialIcons')..addFont(Future.value(icons))).load();
+  } catch (_) {
+    // İkon fontu test ortamında yoksa golden kutu gösterir; kritik değil.
   }
 }
 
