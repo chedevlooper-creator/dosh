@@ -4,6 +4,7 @@ import '../../core/constants.dart';
 import '../../core/strings.dart';
 import '../../data/progress_store.dart';
 import '../theme.dart';
+import '../widgets/animated_count.dart';
 import '../widgets/scenic_background.dart';
 
 /// İstatistik ekranı: oyuncunun tüm ilerleme verilerini görsel kartlarla
@@ -262,8 +263,8 @@ class _StatCard extends StatelessWidget {
         children: [
           Icon(icon, color: iconColor, size: 28),
           const SizedBox(height: 6),
-          Text(
-            value,
+          AnimatedCount(
+            target: int.tryParse(value) ?? 0,
             style: const TextStyle(
               color: AppColors.ink,
               fontSize: 20,
@@ -565,8 +566,8 @@ class _ProgressRow extends StatelessWidget {
               ),
             ),
           ),
-          Text(
-            value,
+          AnimatedCount(
+            target: int.tryParse(value) ?? 0,
             style: const TextStyle(
               color: AppColors.ink,
               fontSize: 18,
