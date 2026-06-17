@@ -30,6 +30,11 @@ class StatsScreen extends StatelessWidget {
     final completed = store.completedLevels(levelCount);
     final dist = store.starDistribution(levelCount);
     final totalGameLevels = levelCount - 1; // tutorial hariç
+    final coinsEarned = store.totalCoinsEarned;
+    final coinsSpent = store.totalCoinsSpent;
+    final hintsUsed = store.totalHintsUsed;
+    final totalWords = store.totalWordsEver;
+    final totalBonus = store.totalBonusEver;
 
     return Scaffold(
       body: Stack(
@@ -77,6 +82,11 @@ class StatsScreen extends StatelessWidget {
                             total: totalGameLevels,
                             bonus: bonus,
                             tutorialDone: store.tutorialDone,
+                            coinsEarned: coinsEarned,
+                            coinsSpent: coinsSpent,
+                            hintsUsed: hintsUsed,
+                            totalWordsEver: totalWords,
+                            totalBonusEver: totalBonus,
                           ),
                           const SizedBox(height: 28),
                         ],
@@ -417,12 +427,22 @@ class _ProgressCards extends StatelessWidget {
     required this.total,
     required this.bonus,
     required this.tutorialDone,
+    required this.coinsEarned,
+    required this.coinsSpent,
+    required this.hintsUsed,
+    required this.totalWordsEver,
+    required this.totalBonusEver,
   });
 
   final int completed;
   final int total;
   final int bonus;
   final bool tutorialDone;
+  final int coinsEarned;
+  final int coinsSpent;
+  final int hintsUsed;
+  final int totalWordsEver;
+  final int totalBonusEver;
 
   @override
   Widget build(BuildContext context) {
@@ -449,6 +469,45 @@ class _ProgressCards extends StatelessWidget {
               : const Color(0xFFBBBBBB),
           label: Strings.t('stats_tutorial'),
           value: tutorialDone ? '✓' : '—',
+        ),
+        const SizedBox(height: 16),
+
+        // ── Kümülatif istatistikler ──
+        _SectionLabel(text: Strings.t('stats_lifetime')),
+        const SizedBox(height: 10),
+        _ProgressRow(
+          icon: Icons.text_fields_rounded,
+          iconColor: AppColors.gold,
+          label: Strings.t('stats_words_solved'),
+          value: '$totalWordsEver',
+        ),
+        const SizedBox(height: 8),
+        _ProgressRow(
+          icon: Icons.auto_awesome_rounded,
+          iconColor: const Color(0xFF8B6FC0),
+          label: Strings.t('stats_bonus_found'),
+          value: '$totalBonusEver',
+        ),
+        const SizedBox(height: 8),
+        _ProgressRow(
+          icon: Icons.monetization_on_rounded,
+          iconColor: AppColors.gold,
+          label: Strings.t('stats_coins_earned'),
+          value: '$coinsEarned',
+        ),
+        const SizedBox(height: 8),
+        _ProgressRow(
+          icon: Icons.shopping_cart_rounded,
+          iconColor: const Color(0xFFE08B50),
+          label: Strings.t('stats_coins_spent'),
+          value: '$coinsSpent',
+        ),
+        const SizedBox(height: 8),
+        _ProgressRow(
+          icon: Icons.lightbulb_rounded,
+          iconColor: const Color(0xFFFFD700),
+          label: Strings.t('stats_hints'),
+          value: '$hintsUsed',
         ),
       ],
     );

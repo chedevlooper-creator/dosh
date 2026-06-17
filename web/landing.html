@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Дош — Çeçence Kelime Bulmaca</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: linear-gradient(180deg, #233645 0%, #14202b 100%);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+    }
+    .logo {
+      width: 160px;
+      height: 160px;
+      border-radius: 32px;
+      margin-bottom: 24px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    }
+    h1 { font-size: 2.8rem; margin-bottom: 8px; }
+    h2 { font-size: 1.2rem; color: #f5d58c; font-weight: 500; margin-bottom: 32px; }
+    .buttons { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 28px;
+      border-radius: 14px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 1.05rem;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .btn:hover { transform: translateY(-2px); }
+    .btn-primary {
+      background: linear-gradient(135deg, #ffd580, #f5b62b);
+      color: #1a1a1a;
+      box-shadow: 0 8px 24px rgba(245, 182, 43, 0.35);
+    }
+    .btn-secondary {
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.25);
+    }
+    .features {
+      margin-top: 48px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 20px;
+      max-width: 720px;
+      width: 100%;
+    }
+    .feature {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 20px;
+    }
+    .feature strong { display: block; color: #f5d58c; margin-bottom: 6px; }
+    .feature span { font-size: 0.9rem; color: #c8d2db; }
+    footer {
+      margin-top: 48px;
+      font-size: 0.85rem;
+      color: #7f8c9a;
+    }
+    footer a { color: #f5d58c; }
+  </style>
+</head>
+<body>
+  <img src="icons/Icon-192.png" alt="Дош logo" class="logo">
+  <h1>Дош</h1>
+  <h2>Çeçence Kelime Bulmaca • 51 Seviye • Günlük Görev</h2>
+
+  <div class="buttons">
+    <a class="btn btn-primary" href="/">
+      <span>▶</span> Web'de Oyna
+    </a>
+    <a class="btn btn-secondary" href="/apk">
+      <span>⬇</span> Android APK İndir
+    </a>
+  </div>
+
+  <div class="features">
+    <div class="feature">
+      <strong>51 Seviye</strong>
+      <span>Kolaydan zora artan zorluk</span>
+    </div>
+    <div class="feature">
+      <strong>4 Tematik Paket</strong>
+      <span>Doğa, yiyecek, nesne, kavram</span>
+    </div>
+    <div class="feature">
+      <strong>Günlük Görev</strong>
+      <span>Her gün yeni seviye ve ödül</span>
+    </div>
+    <div class="feature">
+      <strong>Ücretsiz & ReklamsĴz</strong>
+      <span>Offline oynanabilir</span>
+    </div>
+  </div>
+
+  <footer>
+    Açık kaynak • <a href="https://github.com/YOUR_USERNAME/dosh">GitHub</a>
+  </footer>
+</body>
+</html>

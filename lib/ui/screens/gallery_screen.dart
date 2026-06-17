@@ -132,6 +132,29 @@ class _GalleryGrid extends StatelessWidget {
   List<Level> get _gameLevels =>
       levels.where((l) => l.id != 0).toList();
 
+  Map<int, List<Level>> get _packs {
+    final map = <int, List<Level>>{};
+    for (final l in _gameLevels) {
+      map.putIfAbsent(l.pack, () => []).add(l);
+    }
+    return map;
+  }
+
+  String _packTitle(int pack) {
+    switch (pack) {
+      case 1:
+        return 'Дога / Хьанж';
+      case 2:
+        return 'Хьанж / Боьярш';
+      case 3:
+        return 'ГӀирс / Ойла';
+      case 4:
+        return 'Уггаре дара / Зор';
+      default:
+        return 'Дешнаш';
+    }
+  }
+
   void _showLockedHint(BuildContext context, int levelId) {
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
@@ -147,32 +170,68 @@ class _GalleryGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final gameLevels = _gameLevels;
-    return GridView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 4,
-        mainAxisSpacing: 12,
-        crossAxisSpacing: 12,
-        childAspectRatio: 0.85,
-      ),
-      itemCount: gameLevels.length,
-      itemBuilder: (context, i) {
-        final level = gameLevels[i];
-        final stars = store.starsFor(level.id);
-        final locked = !store.isLevelUnlocked(level.id);
-        return _LevelTile(
-          level: level,
-          stars: stars,
-          locked: locked,
-          onTap: locked
-              ? () => _showLockedHint(context, level.id)
-              : () {
-                  final originalIndex = levels.indexOf(level);
-                  onPick(originalIndex);
-                },
-        );
-      },
+    final packs = _packs;
+    return CustomScrollView(
+      slivers: [
+        for (final entry in packs.entries) ...[
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+              child: Row(
+                children: [
+                  Container(
+                    width: 6,
+                    height: 22,
+                    decoration: BoxDecoration(
+                      color: AppColors.gold,
+                      borderRadius: BorderRadius.circular(3),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Text(
+                    _packTitle(entry.key),
+                    style: const TextStyle(
+                      fontFamily: AppText.displayFamily,
+                      fontFamilyFallback: AppText.displayFallback,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.ink,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            sliver: SliverGrid.builder(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 4,
+                mainAxisSpacing: 12,
+                crossAxisSpacing: 12,
+                childAspectRatio: 0.85,
+              ),
+              itemCount: entry.value.length,
+              itemBuilder: (context, i) {
+                final level = entry.value[i];
+                final stars = store.starsFor(level.id);
+                final locked = !store.isLevelUnlocked(level.id);
+                return _LevelTile(
+                  level: level,
+                  stars: stars,
+                  locked: locked,
+                  onTap: locked
+                      ? () => _showLockedHint(context, level.id)
+                      : () {
+                          final originalIndex = levels.indexOf(level);
+                          onPick(originalIndex);
+                        },
+                );
+              },
+            ),
+          ),
+        ],
+      ],
     );
   }
 }

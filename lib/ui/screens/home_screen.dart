@@ -138,13 +138,14 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             _TitleBlock(compact: compact, tiny: tiny),
                             if (!tiny)
-                              Padding(
-                                padding: const EdgeInsets.only(top: 10),
-                                child: _DailyChallengeCard(
-                                  done: widget.store.dailyChallengeDone,
-                                  onTap: widget.onDailyChallenge ?? () {},
-                                ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 10),
+                              child: _DailyChallengeCard(
+                                done: widget.store.dailyChallengeDone,
+                                levelNumber: ProgressStore.dailyLevelIndex(widget.levels.length),
+                                onTap: widget.onDailyChallenge ?? () {},
                               ),
+                            ),
                             const Spacer(),
                             _HomeActionBand(
                               levelTitle: Strings.t('level_$levelNumber'),
@@ -1101,26 +1102,30 @@ class _MountainOutlinePainter extends CustomPainter {
 class _DailyChallengeCard extends StatelessWidget {
   const _DailyChallengeCard({
     required this.done,
+    required this.levelNumber,
     required this.onTap,
   });
 
   final bool done;
+  final int levelNumber;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return Semantics(
-      label: done ? 'Günlük challenge tamamlandı' : 'Günlük challenge',
+      label: done
+          ? 'Günlük challenge tamamlandı'
+          : 'Günlük challenge seviye $levelNumber',
       button: !done,
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: done ? null : onTap,
-          borderRadius: BorderRadius.circular(999),
+          borderRadius: BorderRadius.circular(18),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(999),
+              borderRadius: BorderRadius.circular(18),
               gradient: LinearGradient(
                 colors: done
                     ? const [Color(0xFF5A8F6A), Color(0xFF4A7B58)]
@@ -1145,32 +1150,59 @@ class _DailyChallengeCard extends StatelessWidget {
                 Icon(
                   done ? Icons.check_circle_rounded : Icons.star_rounded,
                   color: done ? const Color(0xFFD4F0DA) : AppColors.ink,
-                  size: 22,
+                  size: 26,
                 ),
-                const SizedBox(width: 8),
-                Text(
-                  done ? Strings.t('daily_challenge_done') : Strings.t('daily_challenge'),
-                  style: TextStyle(
-                    color: done ? const Color(0xFFD4F0DA) : AppColors.ink,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w800,
-                  ),
+                const SizedBox(width: 12),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      done ? Strings.t('daily_challenge_done') : Strings.t('daily_challenge'),
+                      style: TextStyle(
+                        color: done ? const Color(0xFFD4F0DA) : AppColors.ink,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '${Strings.t('level')} $levelNumber',
+                      style: TextStyle(
+                        color: (done ? const Color(0xFFD4F0DA) : AppColors.ink)
+                            .withValues(alpha: 0.85),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
                 ),
                 if (!done) ...[
-                  const SizedBox(width: 6),
+                  const SizedBox(width: 12),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: AppColors.ink.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(999),
                     ),
-                    child: Text(
-                      '+${GameConfig.dailyChallengeBonus}',
-                      style: const TextStyle(
-                        color: AppColors.ink,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w900,
-                      ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.monetization_on_rounded,
+                          color: AppColors.ink,
+                          size: 13,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          '+${GameConfig.dailyChallengeBonus}',
+                          style: const TextStyle(
+                            color: AppColors.ink,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],

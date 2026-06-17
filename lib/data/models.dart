@@ -65,10 +65,14 @@ class Level {
     required List<String> letters,
     required this.words,
     List<String> bonusWords = const [],
+    this.pack = 0,
   })  : letters = [for (final l in letters) normalize(l)],
         bonusWords = {for (final w in bonusWords) normalize(w)};
 
   final int id;
+
+  /// Tematik paket indeksi (0: tutorial, 1: doğa/hayvan, 2: yiyecek/renk, 3: nesne/kavram, 4: zor/karışık).
+  final int pack;
 
   /// Çark grafemleri (digraflar tek eleman).
   final List<String> letters;
@@ -166,5 +170,6 @@ class Level {
         bonusWords: [
           for (final b in (json['bonus'] as List? ?? const [])) b as String,
         ],
+        pack: (json['pack'] as int?) ?? 0,
       );
 }

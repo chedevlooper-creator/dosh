@@ -1,0 +1,322 @@
+# ============================================================
+# ÇEÇENCE KELİMELER - WEB BROWSER İLE TOPLANAN YENİ KELİMELER
+# ============================================================
+# Kaynaklar:
+#   - ce.wikipedia.org (Chechen Wikipedia - bitki/hayvan kategorileri)
+#   - baltoslav.eu (Çeçence-Rusça sözlük, 230 kelime)
+#   - ru.wiktionary.org (Rusça Vikisözlük - 1096 Çeçence isim)
+#   - en.wiktionary.org (Swadesh listesi)
+#   - polyglotclub.com (Vücut bölümleri)
+#   - wikitravel.org (Çeçence konuşma kılavuzu)
+# Tarih: Haziran 2026
+# ============================================================
+# Oyun için en uygun 311 kelime (2-6 grapheme, gerçek Çeçence)
+# Rusça alıntılar elendi
+# ============================================================
+
+[2 HARFLİ]
+жа          — oğlak, keçi yavrusu
+ун          — unvan, rütbe
+эс          — ?
+яй          — yaz
+
+[3 HARFLİ]
+аса         — törpü, eğe
+ачо         — ?
+бай         — kiraz eriği
+воӏ         — oğlan, erkek çocuk
+гӏа         — yaprak
+джи         — ?
+дур         — kılıç
+жий         — koyun
+зуд         — kadın
+йиш         — şarkı, melodi
+къа         — ? 
+лаа         — avuç
+лаг         — boyun
+нур         — ışın, parıltı
+оти         — ?
+пхи         — beş
+сан         — benim
+суй         — rüya
+таб         — ?
+там         — tat, lezzet
+уза         — ?
+уче         — ?
+хас         — sebze
+хич         — ?
+хор         — koro
+чин         — ünvan
+чич         — ?
+чоа         — ?
+чуо         — karın, göbek
+шед         — tükürük
+шиш         — şiş, çubuk
+ӏай         — uyku
+ӏин         — ?
+
+[4 HARFLİ - EN İYİ ADAYLAR]
+алам        — alem, dünya
+асар        — eser
+байт        — beyit
+бала        — bela, dert
+батт        — ?
+бацо        — ?
+бекх        — borç, suç
+берд        — uçurum
+борд        — dudak 
+буса        — dün
+бухь        — tepe, zirve
+ваба        — veba
+варе        — uyluk
+васт        — eşya, mal
+вета        — ?
+гаур        — gaur (hayvan)
+гори        — ?
+гумс        — ?
+гӏаш        — kol kemiği?
+гӏов        — ?
+даар        — yemek
+дерг        — ?
+дерт        — ?
+дзаз        — ?
+доӏа        — dua
+евле        — Yahudi
+жижи        — et
+жӏов        — zincir
+карс        — yara
+килг        — el (organ)
+кира        — ?
+кица        — atasözü
+кост        — kostüm
+кура        — gururlu
+кхаъ        — olay, vaka
+кхел        — kader, yargı
+кхиа        — başarmak
+къиг        — ?
+лард        — temel
+лахе        — ?
+лекъ        — ?
+лими        — ?
+лоьм        — aslan (dişi)
+мага        — denemek
+майр        — koca, eş
+меже        — sınır
+мича        — nerede
+нест        — ?
+никх        — ?
+ност        — ?
+огар        — ?
+пийл        — fil
+пулу        — ?
+рагӏ        — sıra, düzen
+сайн        — kendimin
+самг        — ?
+сени        — samanlık
+стим        — ?
+сунт        — ?
+тера        — gibi
+тиша        — eski, bayat
+убар        — ?
+умео        — ?
+унхо        — görevli, memur
+упха        — tutamak
+хаар        — bilgi, haberdar olma
+херо        — kahraman
+хехо        — ?
+хоам        — mesaj, haber
+хьал        — durum, hal
+хьер        — ?
+хьех        — ?
+цица        — ?
+цкъа        — bir kere, bir defa
+цӏом        — kuyruk?
+чинт        — ?
+чода        — ?
+чопа        — ?
+чуда        — ?
+чӏаж        — ? 
+чӏуг        — demir çubuk
+шахь        — şah
+шина        — iki (ilgi hali)
+эсий        — ?
+юург        — yüzük
+
+[5 HARFLİ - EN İYİ ADAYLAR]
+алаша       — aygır
+аьрха       — inatçı
+балда       — dudak
+балха       — işte, çalışmada
+башхо       — başkan
+бежан       — ?
+берса       — kuzu
+бесни       — yanak
+болам       — hareket
+бохам       — felaket, afet
+буьрк       — ?
+весет       — vasiyet
+гарза       — at (renk)
+гериг       — ?
+гомха       — ?
+гуола       — diz eklemi?
+гӏели       — ?
+гӏело       — kale?
+гӏирс       — alet
+дадар       — kaçış
+даӏам       — tat
+дешар       — okuma
+дзама       — zaman
+довхо       — sıcaklık
+дожар       — yağmur
+доьла       — diş eti
+дӏовш       — ?
+жайна       — ?
+жугги       — Yahudi
+зайла       — ?
+захал       — ?
+зовкх       — ?
+зулам       — zulüm, eziyet
+ийзар       — acı
+йолор       — ?
+йоьхь       — başlangıç?
+кепек       — kopek (para)
+ковст       — ?
+кулга       — el
+кхоьш       — ?
+ламаз       — namaz
+легаш       — boğaz
+лелар       — davranış
+лелор       — kullanma
+лулео       — ?
+мекха       — sakal
+мисар       — Mısır (ülke)
+молха       — ilaç
+мутта       — ?
+некъе       — yolda?
+низам       — nizam, düzen
+нохчо       — Çeçen
+пхьаж       — ?
+ринжа       — ?
+салти       — asker
+севгӏ       — ?
+собар       — sabır
+сонта       — deli, aptal
+терза       — terazi
+тохар       — darbe
+уккал       — ?
+харцо       — yalan
+хатта       — sormak
+хедар       — ?
+херси       — ?
+хорам       — ?
+хорха       — ?
+хутал       — çanta
+хьайн       — kendinin
+хьаст       — kaynak, pınar
+хӏост       — ?
+церан       — onların
+цӏахь       — evde
+чабол       — ?
+чапха       — keçe, yamalık
+чухта       — ?
+чуьрк       — böcek
+чӏинг       — çene
+чӏинт       — hırsız
+шаршу       — ?
+ӏалам       — doğa, tabiat
+ӏоман       — Umman
+ӏуйре       — sabah
+
+[6 HARFLİ - EN İYİ ADAYLAR]
+арданг       — ?
+бахтар       — ?
+белахо       — işçi
+бешахо       — bahçıvan
+бухахь       — altında
+буьйра       — ?
+варвар       — barbar
+варзап       — ?
+гоьзжа       — ?
+гурахь       — etrafta
+гуттар       — her zaman
+гуьмсе       — ?
+гӏумки       — Kumuk
+девзиг       — buluşma
+дзайла       — ?
+дингад       — ?
+доьлаш       — diş etleri
+дугаро       — ?
+еврази       — Avrasya
+жиргӏа       — cırcır böceği
+жуьгти       — Yahudi
+жӏонка       — zincir (küçük)
+зарзар       — ?
+заьзга       — ?
+идархо       — yönetici
+йочуна       — ?
+канӏан       — ?
+кешнаш       — mezarlar
+киртиг       — parça, kırıntı
+кхакха       — ?
+кхалкх       — çene
+кхачар       — ulaşma
+кхерар       — korku
+кхиъна       — olgunlaşmış
+къазах       — Kazak
+къилба       — güney
+къонза       — ?
+ламаст       — ?
+ларгар       — ?
+лаьцна       — yakalanmış
+лестам       — ?
+лийчар       — ?
+луьйта       — ?
+маймал       — maymun
+масдар       — mastar (gramer)
+махбар       — haber
+маьӏна       — anlam
+мекхаш       — sakallar
+миндар       — yastık
+назбар       — ?
+наштар       — ?
+неӏалт       — torun
+ноткъа       — nokta
+нуьйжа       — uyuyan
+орамат       — bitki
+пийсак       — ?
+пиллиг       — yavru
+пирӏун       — ?
+пондар       — müzik aleti
+пханар       — okçu
+сайгак       — antilop
+саллар       — ?
+сарахь       — akşamleyin
+статйа       — olmak
+такхар       — tekrar
+тарсал       — keklik
+тӏадам       — damla
+тӏегӏа       — ?
+хандош       — ?
+хасбеш       — sebze bahçesi
+хехкар       — ?
+хийцар       — değişim
+хилург       — kimyager
+холхаз       — ?
+хорсам       — testis?
+хоттар       — soru
+хьайба       — inek
+хьалхе       — önceki
+хьархо       — hırsız
+хьаьаш       — ?
+хьесап       — hesap
+цомгуш       — hasta
+чуьйна       — ?
+чӏирхо       — ?
+шарбал       — ?
+шарнир       — menteşe
+шолхаг       — ?
+эккхар       — kaçış
+эрмало       — Ermeni
+ягораг       — ?
+ӏамбар       — amber
+ӏонжар       — ?

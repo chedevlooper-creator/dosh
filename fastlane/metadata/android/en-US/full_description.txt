@@ -1,0 +1,12 @@
+Dosh is a polished mobile word puzzle game for learning the Chechen language.
+
+Drag letters from the spinning wheel to build words, fill the crossword grid, and unlock hidden bonus words. Every solved word reveals its Turkish meaning, turning each round into a tiny language lesson.
+
+Features:
+- 51 handcrafted levels with smooth difficulty progression
+- Themed packs: nature, animals, food, colors, objects, concepts
+- Daily challenge with coin rewards
+- Bonus words hidden in the letter wheel
+- 3 scenic themes: Caucasus, night, forest
+- Lifetime statistics
+- No ads, no in-app purchases, works offline

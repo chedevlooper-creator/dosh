@@ -263,6 +263,8 @@ class GameController extends ChangeNotifier {
     _coins += reward;
     coinsListenable.value = _coins;
     unawaited(store.setCoins(_coins));
+    unawaited(store.addCoinsEarned(reward));
+    unawaited(store.addWordSolved(isBonus: true));
     _events.add(BonusWordFound(word));
     _events.add(CoinsGained(reward));
     notifyListeners();
@@ -295,11 +297,13 @@ class GameController extends ChangeNotifier {
       _coins += reward.total;
       coinsListenable.value = _coins;
       unawaited(store.setCoins(_coins));
+      unawaited(store.addCoinsEarned(reward.total));
       if (reward.comboGain > 0) {
         _events.add(ComboBonus(streak: _streak, amount: reward.comboGain));
       }
       _events.add(CoinsGained(reward.total));
     }
+    unawaited(store.addWordSolved(isBonus: false));
     notifyListeners();
     if (levelDone) {
       // Fire-and-forget: UI tarafı event'i dinler, persist yazımı sıralıdır.
@@ -365,6 +369,8 @@ class GameController extends ChangeNotifier {
     _coins -= Scoring.hintCost();
     coinsListenable.value = _coins;
     unawaited(store.setCoins(_coins));
+    unawaited(store.addCoinsSpent(Scoring.hintCost()));
+    unawaited(store.addHintUsed());
     _events.add(HintRevealed(cell));
     for (final word in level.words) {
       if (!solvedWords.contains(word.word) && word.cells.every(cellFilled)) {

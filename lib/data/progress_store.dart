@@ -133,6 +133,11 @@ class ProgressStore {
   // --- İstatistikler -------------------------------------------------------
 
   static const _kBestStreak = 'best_streak';
+  static const _kTotalWordsSolved = 'stat_total_words';
+  static const _kTotalBonusWords = 'stat_total_bonus';
+  static const _kTotalCoinsEarned = 'stat_coins_earned';
+  static const _kTotalCoinsSpent = 'stat_coins_spent';
+  static const _kTotalHintsUsed = 'stat_hints_used';
 
   /// Tüm zamanların en iyi serisi.
   int get bestStreak => _prefs.getInt(_kBestStreak) ?? 0;
@@ -142,6 +147,41 @@ class ProgressStore {
     if (value > current) {
       await _prefs.setInt(_kBestStreak, value);
     }
+  }
+
+  // --- Kümülatif istatistik sayaçları ---------------------------------------
+
+  /// Toplam kazanılan coin (tüm zamanlar).
+  int get totalCoinsEarned => _prefs.getInt(_kTotalCoinsEarned) ?? 0;
+
+  /// Toplam harcanan coin (ipucu için).
+  int get totalCoinsSpent => _prefs.getInt(_kTotalCoinsSpent) ?? 0;
+
+  /// Toplam kullanılan ipucu sayısı.
+  int get totalHintsUsed => _prefs.getInt(_kTotalHintsUsed) ?? 0;
+
+  /// Toplam çözülen kelime sayısı (grid, tüm zamanlar).
+  int get totalWordsEver => _prefs.getInt(_kTotalWordsSolved) ?? 0;
+
+  /// Toplam bulunan bonus kelime sayısı (tüm zamanlar).
+  int get totalBonusEver => _prefs.getInt(_kTotalBonusWords) ?? 0;
+
+  Future<void> addCoinsEarned(int amount) async {
+    await _prefs.setInt(_kTotalCoinsEarned, totalCoinsEarned + amount);
+  }
+
+  Future<void> addCoinsSpent(int amount) async {
+    await _prefs.setInt(_kTotalCoinsSpent, totalCoinsSpent + amount);
+  }
+
+  Future<void> addHintUsed() async {
+    await _prefs.setInt(_kTotalHintsUsed, totalHintsUsed + 1);
+  }
+
+  Future<void> addWordSolved({bool isBonus = false}) async {
+    final key = isBonus ? _kTotalBonusWords : _kTotalWordsSolved;
+    final current = isBonus ? totalBonusEver : totalWordsEver;
+    await _prefs.setInt(key, current + 1);
   }
 
   // --- Hesaplanan istatistikler ---------------------------------------------

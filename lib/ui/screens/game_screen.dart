@@ -105,6 +105,7 @@ class _GameScreenState extends State<GameScreen> {
           _successWord = word.word.toUpperCase();
           _lastBonusWord = null;
         });
+        _showInfo(Strings.tOrNull(word.infoKey));
       case BonusWordFound(:final word):
         widget.sound.play(SoundCue.solve);
         HapticFeedback.lightImpact();
@@ -115,6 +116,7 @@ class _GameScreenState extends State<GameScreen> {
           _successWord = word.toUpperCase();
           _lastBonusWord = word;
         });
+        _showInfo(Strings.tOrNull('info_$word'));
       case CoinsGained(:final amount):
         widget.sound.play(SoundCue.coin);
         setState(() {
@@ -174,12 +176,28 @@ class _GameScreenState extends State<GameScreen> {
     _game.shuffle();
   }
 
+  String? _infoStripText;
+  Timer? _infoStripTimer;
+
   @override
   void dispose() {
     _advanceTimer?.cancel();
+    _infoStripTimer?.cancel();
     _eventSub.cancel();
     _game.dispose();
     super.dispose();
+  }
+
+  void _showInfo(String? text) {
+    _infoStripTimer?.cancel();
+    if (text == null || text.isEmpty) {
+      setState(() => _infoStripText = null);
+      return;
+    }
+    setState(() => _infoStripText = text);
+    _infoStripTimer = Timer(const Duration(seconds: 3), () {
+      if (mounted) setState(() => _infoStripText = null);
+    });
   }
 
   @override
@@ -265,11 +283,7 @@ class _GameScreenState extends State<GameScreen> {
       constraints.maxHeight * 0.36,
     );
     final level = _game.level;
-    final infoText = _game.lastSolved == null
-        ? (_game.foundBonusWords.isNotEmpty
-            ? Strings.tOrNull('info_$_lastBonusWord')
-            : null)
-        : Strings.tOrNull(_game.lastSolved!.infoKey);
+    final infoText = _infoStripText;
 
     return Column(
       children: [

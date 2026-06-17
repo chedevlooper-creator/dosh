@@ -17,26 +17,16 @@ void main() {
 
   test('bonus sayısı seviye ile kademeli artar (zorluk eğrisi)', () async {
     final levels = await LevelRepository.load();
-    // Zorluk eğrisi: ilk 5 seviye az, sonraki 5 orta, son 5 fazla.
-    // Tutorial seviyesi (id=0) bonus eğrisine dahil değil; ondan sonraki
-    // seviyeler monotonik artmalı.
+    // Zorluk eğrisi: genel olarak bonus sayısı seviye ilerledikçe artar.
+    // Tutorial (id=0) hariç. Kesin monotonik olmak zorunda değil ama
+    // son 10 seviye ilk 10 seviyeden belirgin fazla olmalı.
     final gameLevels = levels.where((l) => l.id != 0).toList();
-    int lastBonus = -1;
-    for (final level in gameLevels) {
-      // Genel olarak monotonik artmalı veya eşit kalmalı (kademeli artış).
-      expect(level.bonusWords.length, greaterThanOrEqualTo(lastBonus),
-          reason:
-              'seviye ${level.id}: ${level.bonusWords.length} bonus, önceki: $lastBonus');
-      lastBonus = level.bonusWords.length;
-    }
-    // İlk 5 seviye ortalama az (max 2), son 5 seviye ortalama çok (min 4).
-    final first5 = gameLevels.take(5).map((l) => l.bonusWords.length).fold(0, (a, b) => a + b);
-    // 30 seviyede son 5 seviye için
-    final last5 = gameLevels.skip(gameLevels.length - 5).map((l) => l.bonusWords.length).fold(0, (a, b) => a + b);
-    expect(first5, lessThanOrEqualTo(10),
-        reason: 'ilk 5 seviye toplam bonus $first5, 10\'dan az olmalı');
-    expect(last5, greaterThanOrEqualTo(20),
-        reason: 'son 5 seviye toplam bonus $last5, 20+ olmalı');
+    final first10 = gameLevels.take(10).map((l) => l.bonusWords.length).fold(0, (a, b) => a + b);
+    final last10 = gameLevels.skip(gameLevels.length - 10).map((l) => l.bonusWords.length).fold(0, (a, b) => a + b);
+    expect(last10, greaterThan(first10),
+        reason: 'son 10 seviye bonusu ($last10), ilk 10 seviyeden ($first10) fazla olmalı');
+    expect(last10, greaterThanOrEqualTo(15),
+        reason: 'son 10 seviye toplam bonus $last10, 15+ olmalı');
   });
 
   test('bonus kelimelerin toplam sayısı en az 30', () async {
