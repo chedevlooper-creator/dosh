@@ -74,11 +74,8 @@ class _GameScreenState extends State<GameScreen> {
   int _levelEarned = 0;
   bool _showComplete = false;
   bool _challengeBonusApplied = false;
+  bool _isBonusInfo = false;
   Timer? _advanceTimer;
-
-  /// Son bulunan bonus kelime — alt bilgi şeridinde açıklaması gösterilir;
-  /// ızgaradan yeni bir kelime çözülünce yerini ona bırakır.
-  String? _lastBonusWord;
 
   @override
   void initState() {
@@ -103,18 +100,16 @@ class _GameScreenState extends State<GameScreen> {
         setState(() {
           _successTick++;
           _successWord = word.word.toUpperCase();
-          _lastBonusWord = null;
+          _isBonusInfo = false;
         });
         _showInfo(Strings.tOrNull(word.infoKey));
       case BonusWordFound(:final word):
         widget.sound.play(SoundCue.solve);
         HapticFeedback.lightImpact();
         setState(() {
-          // Bonus kelime: success animasyonu YOK (kapsül hâlâ seçimde
-          // gösterilecek), sadece bonus-specific altın pulse tetiklenir.
           _bonusTick++;
           _successWord = word.toUpperCase();
-          _lastBonusWord = word;
+          _isBonusInfo = true;
         });
         _showInfo(Strings.tOrNull('info_$word'));
       case CoinsGained(:final amount):
@@ -191,7 +186,10 @@ class _GameScreenState extends State<GameScreen> {
   void _showInfo(String? text) {
     _infoStripTimer?.cancel();
     if (text == null || text.isEmpty) {
-      setState(() => _infoStripText = null);
+      setState(() {
+        _infoStripText = null;
+        _isBonusInfo = false;
+      });
       return;
     }
     setState(() => _infoStripText = text);
@@ -374,7 +372,7 @@ class _GameScreenState extends State<GameScreen> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Expanded(child: InfoStrip(text: infoText)),
+              Expanded(child: InfoStrip(text: infoText, isBonus: _isBonusInfo)),
               const SizedBox(width: 10),
               // Sadece coin değiştiğinde rebuild olur (granüler dinleme).
               ListenableBuilder(

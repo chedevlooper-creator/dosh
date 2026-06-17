@@ -135,6 +135,7 @@ class ValidatedTextController extends ChangeNotifier {
   String _text;
   String? _error;
   bool _touched = false;
+  // ignore: unused_field
   bool _focused = false;
 
   String get text => _text;
@@ -193,10 +194,6 @@ class ValidatedTextController extends ChangeNotifier {
     _error = null;
     _touched = false;
     notifyListeners();
-  }
-
-  void dispose() {
-    // ChangeNotifier base class'dan geliyor
   }
 }
 

@@ -29,11 +29,17 @@ class ScenicBackground extends StatelessWidget {
     return Stack(
       fit: StackFit.expand,
       children: [
-        // 1. Vektör manzara çizimi
+        // 1. Vektör manzara çizimi (tema değişince crossfade)
         Positioned.fill(
-          child: CustomPaint(
-            painter: _MountainScenePainter(theme: theme),
-            size: Size.infinite,
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 600),
+            switchInCurve: Curves.easeOutQuad,
+            switchOutCurve: Curves.easeInQuad,
+            child: CustomPaint(
+              key: ValueKey('scene_${theme.name}'),
+              painter: _MountainScenePainter(theme: theme),
+              size: Size.infinite,
+            ),
           ),
         ),
 

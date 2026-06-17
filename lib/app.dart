@@ -12,6 +12,7 @@ import 'ui/screens/settings_screen.dart';
 import 'ui/screens/stats_screen.dart';
 import 'ui/screens/dictionary_screen.dart';
 import 'ui/theme.dart';
+import 'ui/widgets/page_transition.dart';
 import 'ui/widgets/scenic_background.dart';
 
 enum _AppScreen { home, gallery, game, settings, stats, dictionary }
@@ -35,6 +36,7 @@ class DoshApp extends StatefulWidget {
 class _DoshAppState extends State<DoshApp> {
   late final GameSound _sound;
   late _AppScreen _screen;
+  late _AppScreen _previousScreen;
   int _pickedIndex = 0;
   bool _isDailyChallenge = false;
   late int _themeIndex;
@@ -45,6 +47,7 @@ class _DoshAppState extends State<DoshApp> {
     _sound = GameSound(store: widget.store);
     _themeIndex = widget.store.themeIndex;
     _screen = widget.showHome ? _AppScreen.home : _AppScreen.game;
+    _previousScreen = _screen;
     _isDailyChallenge = false;
   }
 
@@ -62,16 +65,26 @@ class _DoshAppState extends State<DoshApp> {
 
   SceneTheme get _theme => SceneTheme.values[_themeIndex];
 
+  TransitionDirection get _transitionDirection {
+    // Home'a dönüş = backward
+    if (_screen == _AppScreen.home && _previousScreen != _AppScreen.home) {
+      return TransitionDirection.backward;
+    }
+    // Home'dan başka bir yere = forward
+    if (_previousScreen == _AppScreen.home && _screen != _AppScreen.home) {
+      return TransitionDirection.forward;
+    }
+    return TransitionDirection.forward;
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: Strings.t('app_title'),
       debugShowCheckedModeBanner: false,
       theme: buildTheme(),
-      home: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 420),
-        switchInCurve: Curves.easeOutCubic,
-        switchOutCurve: Curves.easeInCubic,
+      home: PageTransitionSwitcher(
+        direction: _transitionDirection,
         child: _buildScreen(),
       ),
     );
@@ -148,52 +161,80 @@ class _DoshAppState extends State<DoshApp> {
 
   void _goHome() {
     _sound.play(SoundCue.tap);
-    setState(() => _screen = _AppScreen.home);
+    setState(() {
+      _previousScreen = _screen;
+      _screen = _AppScreen.home;
+    });
   }
 
   void _goSettings() {
     _sound.play(SoundCue.tap);
-    setState(() => _screen = _AppScreen.settings);
+    setState(() {
+      _previousScreen = _screen;
+      _screen = _AppScreen.settings;
+    });
   }
 
   void _goStats() {
     _sound.play(SoundCue.tap);
-    setState(() => _screen = _AppScreen.stats);
+    setState(() {
+      _previousScreen = _screen;
+      _screen = _AppScreen.stats;
+    });
   }
 
   void _goDictionary() {
     _sound.play(SoundCue.tap);
-    setState(() => _screen = _AppScreen.dictionary);
+    setState(() {
+      _previousScreen = _screen;
+      _screen = _AppScreen.dictionary;
+    });
   }
 
   void _goGallery() {
-    _sound.play(SoundCue.tap);        if (widget.store.tutorialDone) {
-          setState(() => _screen = _AppScreen.gallery);
-        } else {
-          _pickedIndex = 0;
-          _isDailyChallenge = false;
-          setState(() => _screen = _AppScreen.game);
-        }
+    _sound.play(SoundCue.tap);
+    if (widget.store.tutorialDone) {
+      setState(() {
+        _previousScreen = _screen;
+        _screen = _AppScreen.gallery;
+      });
+    } else {
+      _pickedIndex = 0;
+      _isDailyChallenge = false;
+      setState(() {
+        _previousScreen = _screen;
+        _screen = _AppScreen.game;
+      });
+    }
   }
 
   void _startDailyChallenge() {
     _sound.play(SoundCue.tap);
     _pickedIndex = ProgressStore.dailyLevelIndex(widget.levels.length);
     _isDailyChallenge = true;
-    setState(() => _screen = _AppScreen.game);
+    setState(() {
+      _previousScreen = _screen;
+      _screen = _AppScreen.game;
+    });
   }
 
   void _onHowToPlay() {
     _sound.play(SoundCue.tap);
     _pickedIndex = 0;
     _isDailyChallenge = false;
-    setState(() => _screen = _AppScreen.game);
+    setState(() {
+      _previousScreen = _screen;
+      _screen = _AppScreen.game;
+    });
   }
 
   void _onTutorialComplete() async {
     await widget.store.setTutorialDone(true);
     if (!mounted) return;
     _sound.play(SoundCue.tap);
-    setState(() => _screen = _AppScreen.gallery);
+    setState(() {
+      _previousScreen = _screen;
+      _screen = _AppScreen.gallery;
+    });
   }
 }
