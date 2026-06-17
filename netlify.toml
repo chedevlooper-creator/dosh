@@ -1,19 +1,18 @@
+# Build is handled by GitHub Actions (.github/workflows/release.yml)
+# Netlify only serves the pre-built files
 [build]
   publish = "build/web"
-  command = "flutter build web --release"
-
-[build.environment]
-  FLUTTER_VERSION = "stable"
+  ignore = "git diff --quiet HEAD^ HEAD"
 
 [[redirects]]
   from = "/download"
-  to = "https://github.com/YOUR_USERNAME/dosh/releases/latest"
+  to = "https://github.com/chedevlooper-creator/dosh/releases/latest"
   status = 302
   force = true
 
 [[redirects]]
   from = "/apk"
-  to = "https://github.com/YOUR_USERNAME/dosh/releases/latest/download/app-release.apk"
+  to = "https://github.com/chedevlooper-creator/dosh/releases/latest/download/app-release.apk"
   status = 302
   force = true
 
