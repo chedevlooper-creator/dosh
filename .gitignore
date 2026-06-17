@@ -50,5 +50,8 @@ test_log.txt
 git_log.txt
 test/goldens/
 
+# Çevresel değişkenler
+.env
+
 # Otomatik üretilen önizleme görseli
 assets/icon/icon_preview_256.png
