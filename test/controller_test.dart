@@ -463,4 +463,37 @@ void main() {
 
     game.dispose();
   });
+
+  test('useTargetHint: locks selected cell and reveals it, deducts 35 coins', () async {
+    final game = await _newGame(_malxLevel());
+    final initialCoins = game.coins;
+
+    final cell = const Cell(0, 0);
+    expect(game.cellFilled(cell), isFalse);
+    expect(game.canTargetHint, isTrue);
+
+    game.useTargetHint(cell);
+
+    expect(game.cellFilled(cell), isTrue);
+    expect(game.revealedCells, contains(cell));
+    expect(game.coins, initialCoins - GameConfig.targetHintCost);
+    expect(game.hintsUsed, 1);
+
+    game.dispose();
+  });
+
+  test('useMagicWand: opens up to 3 random closed cells, deducts 60 coins', () async {
+    final game = await _newGame(_malxLevel());
+    final initialCoins = game.coins;
+
+    expect(game.canMagicWand, isTrue);
+
+    game.useMagicWand();
+
+    expect(game.revealedCells.length, 3);
+    expect(game.coins, initialCoins - GameConfig.magicWandCost);
+    expect(game.hintsUsed, 3);
+
+    game.dispose();
+  });
 }

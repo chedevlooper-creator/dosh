@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'dart:ui';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 /// Ekran görüntüsündeki tasarıma birebir uyan, **vektör tabanlı** arka plan.
@@ -26,10 +27,38 @@ class ScenicBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String imagePath;
+    switch (theme) {
+      case SceneTheme.caucasus:
+        imagePath = 'assets/images/caucasus_bg.png';
+        break;
+      case SceneTheme.night:
+        imagePath = 'assets/images/night_bg.png';
+        break;
+      case SceneTheme.forest:
+        imagePath = 'assets/images/forest_bg.png';
+        break;
+      case SceneTheme.autumn:
+        imagePath = 'assets/images/autumn_bg.png';
+        break;
+      case SceneTheme.winter:
+        imagePath = 'assets/images/winter_bg.png';
+        break;
+    }
+
     return Stack(
       fit: StackFit.expand,
       children: [
-        // 1. Vektör manzara çizimi
+        // 1. Premium 4K Image Background Backdrop
+        Positioned.fill(
+          child: Image.asset(
+            imagePath,
+            fit: BoxFit.cover,
+            alignment: Alignment.center,
+          ),
+        ),
+
+        // 2. Weather & Atmospheric Effects Overlay
         Positioned.fill(
           child: CustomPaint(
             painter: _MountainScenePainter(theme: theme),
@@ -38,20 +67,24 @@ class ScenicBackground extends StatelessWidget {
         ),
 
         if (showPlayArea) ...{
-          // 2. Alt Eğimli Bölüm (Bulanık ve gölgeli alan)
+          // 3. Alt Eğimli Bölüm (Bulanık ve gölgeli alan - frosted glass)
           Positioned.fill(
             child: ClipPath(
               clipper: const _CurveSeparatorClipper(),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 9, sigmaY: 9),
-                child: Container(
-                  color: const Color(0x33FBF6EB),
-                ),
-              ),
+              child: kIsWeb
+                  ? Container(
+                      color: const Color(0xEC0B132B), // Very dark frosted navy
+                    )
+                  : BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 9, sigmaY: 9),
+                      child: Container(
+                        color: const Color(0x2BFFFFFF),
+                      ),
+                    ),
             ),
           ),
 
-          // 3. Eğim Sınırı Üzerindeki Beyaz Kalın Kontur ve Yumuşak Gölge
+          // 4. Eğim Sınırı Üzerindeki Beyaz Kalın Kontur ve Yumuşak Gölge
           const Positioned.fill(
             child: CustomPaint(
               painter: _CurveSeparatorPainter(),
@@ -74,6 +107,12 @@ enum SceneTheme {
 
   /// Orman — yeşil tonlar, çam ağaçları, akarsu.
   forest,
+
+  /// Sonbahar Vadisi — turuncu/kahverengi tonlar, yaprak dökümü.
+  autumn,
+
+  /// Karlı Kış — kar kaplı dağlar, kar yağışı.
+  winter,
 }
 
 /// Tema bazlı renk paleti döndürür.
@@ -166,6 +205,42 @@ class _ScenePalette {
     moonColor: Colors.transparent,
   );
 
+  static const autumn = _ScenePalette(
+    skyTop: Color(0xFFC84B31),
+    skyMid: Color(0xFFD9B48F),
+    skyBottom: Color(0xFFF3EAC2),
+    skyHorizon: Color(0xFFFFD56B),
+    ridgeFar: Color(0xFFD08C60),
+    ridgeFarDark: Color(0xFFB57C50),
+    ridgeMid: Color(0xFF99582A),
+    ridgeMidDark: Color(0xFF6F3C1A),
+    ridgeNear: Color(0xFF432818),
+    ridgeNearDark: Color(0xFF2B190E),
+    tower: Color(0xFF2B190E),
+    towerLight: Color(0xFF8F5E36),
+    eagle: Color(0xCC3E2723),
+    starColor: Colors.transparent,
+    moonColor: Colors.transparent,
+  );
+
+  static const winter = _ScenePalette(
+    skyTop: Color(0xFF1D3557),
+    skyMid: Color(0xFF457B9D),
+    skyBottom: Color(0xFFA8DADC),
+    skyHorizon: Color(0xFFF1FAEE),
+    ridgeFar: Color(0xFFBDE0FE),
+    ridgeFarDark: Color(0xFFA2D2FF),
+    ridgeMid: Color(0xFF8E9AAF),
+    ridgeMidDark: Color(0xFF6C757D),
+    ridgeNear: Color(0xFF495057),
+    ridgeNearDark: Color(0xFF343A40),
+    tower: Color(0xFF212529),
+    towerLight: Color(0xFFE9C46A),
+    eagle: Color(0xCC212529),
+    starColor: Colors.transparent,
+    moonColor: Colors.transparent,
+  );
+
   factory _ScenePalette.forTheme(SceneTheme theme) {
     switch (theme) {
       case SceneTheme.caucasus:
@@ -174,6 +249,10 @@ class _ScenePalette {
         return night;
       case SceneTheme.forest:
         return forest;
+      case SceneTheme.autumn:
+        return autumn;
+      case SceneTheme.winter:
+        return winter;
     }
   }
 }
@@ -186,128 +265,18 @@ class _MountainScenePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final p = _ScenePalette.forTheme(theme);
-    final w = size.width;
-    final h = size.height;
-
-    // ---- 1. Gökyüzü gradyanı ----
-    final skyRect = Rect.fromLTWH(0, 0, w, h * 0.82);
-    final skyGradient = LinearGradient(
-      begin: Alignment.topCenter,
-      end: Alignment.bottomCenter,
-      colors: [p.skyTop, p.skyMid, p.skyBottom, p.skyHorizon],
-      stops: const [0, 0.35, 0.62, 0.82],
-    );
-    canvas.drawRect(skyRect, Paint()..shader = skyGradient.createShader(skyRect));
-
-    // ---- 2. Gece temada yıldızlar + aurora ----
     if (theme == SceneTheme.night) {
-      _drawStars(canvas, size, p.starColor);
-      _drawMoon(canvas, size, p.moonColor);
+      _drawStars(canvas, size, const Color(0xCCFFFFFF));
       _drawAurora(canvas, size);
     }
 
-    // ---- 3. Uzak dağ sırası (en arka, en açık) ----
-    _drawRidge(
-      canvas,
-      size,
-      p.ridgeFar,
-      p.ridgeFarDark,
-      points: [
-        const Offset(0.0, 0.52),
-        const Offset(0.06, 0.38),
-        const Offset(0.12, 0.42),
-        const Offset(0.20, 0.32),
-        const Offset(0.28, 0.36),
-        const Offset(0.34, 0.28),
-        const Offset(0.42, 0.34),
-        const Offset(0.48, 0.25),
-        const Offset(0.55, 0.30),
-        const Offset(0.62, 0.22),
-        const Offset(0.70, 0.28),
-        const Offset(0.76, 0.20),
-        const Offset(0.84, 0.26),
-        const Offset(0.92, 0.18),
-        const Offset(1.0, 0.22),
-      ],
-      snowLine: 0.48,
-      snowColor: const Color(0xFFF4F9FC),
-    );
-
-    // ---- 4. Orta dağ sırası ----
-    _drawRidge(
-      canvas,
-      size,
-      p.ridgeMid,
-      p.ridgeMidDark,
-      points: [
-        const Offset(0.0, 0.62),
-        const Offset(0.08, 0.50),
-        const Offset(0.15, 0.54),
-        const Offset(0.22, 0.44),
-        const Offset(0.30, 0.48),
-        const Offset(0.38, 0.38),
-        const Offset(0.46, 0.42),
-        const Offset(0.52, 0.34),
-        const Offset(0.60, 0.40),
-        const Offset(0.68, 0.32),
-        const Offset(0.76, 0.38),
-        const Offset(0.84, 0.30),
-        const Offset(0.92, 0.36),
-        const Offset(1.0, 0.42),
-      ],
-      snowLine: 0.55,
-      snowColor: const Color(0xCCF4F9FC),
-    );
-
-    // ---- 5. Orman temasında akarsu ----
-    if (theme == SceneTheme.forest) {
-      _drawForestRiver(canvas, size, p);
+    if (theme == SceneTheme.autumn) {
+      _drawFallingLeaves(canvas, size);
     }
 
-    // ---- 6. Kuleli tepe (ön planın bir parçası) ----
-    _drawTowerHill(canvas, size, p);
-
-    // ---- 7. Orman temasında çam ağaçları ----
-    if (theme == SceneTheme.forest) {
-      _drawForestTrees(canvas, size, p);
+    if (theme == SceneTheme.winter) {
+      _drawSnowfall(canvas, size);
     }
-
-    // ---- 8. Ön dağ sırası (en koyu) ----
-    _drawRidge(
-      canvas,
-      size,
-      p.ridgeNear,
-      p.ridgeNearDark,
-      points: [
-        const Offset(0.0, 0.70),
-        const Offset(0.05, 0.64),
-        const Offset(0.10, 0.68),
-        const Offset(0.18, 0.58),
-        const Offset(0.25, 0.62),
-        const Offset(0.32, 0.56),
-        const Offset(0.40, 0.60),
-        const Offset(0.48, 0.54),
-        const Offset(0.56, 0.58),
-        const Offset(0.64, 0.52),
-        const Offset(0.72, 0.56),
-        const Offset(0.80, 0.60),
-        const Offset(0.88, 0.56),
-        const Offset(0.95, 0.62),
-        const Offset(1.0, 0.66),
-      ],
-      snowLine: null,
-    );
-
-    // ---- 9. Alt zemin (dağların altını doldur) ----
-    final groundPaint = Paint()..color = p.ridgeNearDark;
-    canvas.drawRect(
-      Rect.fromLTWH(0, h * 0.70, w, h * 0.30),
-      groundPaint,
-    );
-
-    // ---- 10. Kartal silueti ----
-    _drawEagle(canvas, size, p.eagle);
   }
 
   void _drawStars(Canvas canvas, Size size, Color color) {
@@ -704,6 +673,72 @@ class _MountainScenePainter extends CustomPainter {
     }
   }
 
+  void _drawFallingLeaves(Canvas canvas, Size size) {
+    final random = math.Random(101);
+    final leafColors = [
+      const Color(0xFFE65100), // Koyu turuncu
+      const Color(0xFFF57C00), // Orta turuncu
+      const Color(0xFFFFB74D), // Sarı-turuncu
+      const Color(0xFFD84315), // Kırmızımsı turuncu
+      const Color(0xFF8D6E63), // Kurumuş kahverengi yaprak
+    ];
+
+    for (var i = 0; i < 40; i++) {
+      final x = random.nextDouble() * size.width;
+      final y = random.nextDouble() * size.height * 0.70;
+      final leafW = 8.0 + random.nextDouble() * 12.0;
+      final leafH = 4.0 + random.nextDouble() * 8.0;
+      final rotation = random.nextDouble() * 2 * math.pi;
+      final color = leafColors[random.nextInt(leafColors.length)];
+
+      canvas.save();
+      canvas.translate(x, y);
+      canvas.rotate(rotation);
+
+      final paint = Paint()
+        ..color = color.withValues(alpha: 0.85)
+        ..style = PaintingStyle.fill;
+
+      // Yaprak şekli (iki bezıyer eğrisi ile)
+      final path = Path()
+        ..moveTo(-leafW / 2, 0)
+        ..quadraticBezierTo(0, -leafH, leafW / 2, 0)
+        ..quadraticBezierTo(0, leafH, -leafW / 2, 0)
+        ..close();
+
+      canvas.drawPath(path, paint);
+
+      // Damar detayı (ince çizgi)
+      final veinPaint = Paint()
+        ..color = const Color(0x33000000)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.0;
+      canvas.drawLine(Offset(-leafW / 2, 0), Offset(leafW / 2, 0), veinPaint);
+
+      canvas.restore();
+    }
+  }
+
+  void _drawSnowfall(Canvas canvas, Size size) {
+    final random = math.Random(202);
+    final snowPaint = Paint()..color = Colors.white.withValues(alpha: 0.9);
+
+    for (var i = 0; i < 80; i++) {
+      final x = random.nextDouble() * size.width;
+      final y = random.nextDouble() * size.height * 0.70;
+      final r = 1.0 + random.nextDouble() * 3.0;
+
+      // Bazı büyük kar tanelerine soft blur verelim (yakın planda uçuşan kar hissi)
+      if (r > 3.0) {
+        final glowPaint = Paint()
+          ..color = Colors.white.withValues(alpha: 0.4)
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2.0);
+        canvas.drawCircle(Offset(x, y), r * 1.8, glowPaint);
+      }
+      canvas.drawCircle(Offset(x, y), r, snowPaint);
+    }
+  }
+
   @override
   bool shouldRepaint(covariant _MountainScenePainter oldDelegate) =>
       oldDelegate.theme != theme;
@@ -753,7 +788,7 @@ class _CurveSeparatorPainter extends CustomPainter {
     canvas.drawPath(path, shadowPaint);
 
     final borderPaint = Paint()
-      ..color = const Color(0xFFFBF6EB)
+      ..color = const Color(0x80FFFFFF)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 3.5
       ..strokeCap = StrokeCap.round;

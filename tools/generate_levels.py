@@ -102,7 +102,11 @@ for line in curated.splitlines():
             if m and not m.startswith('...') and not m.startswith('…'):
                 MEANINGS[w] = m
 
-for fn in ['cechen_words.txt', 'cechen_words_master.txt']:
+for fn in [
+    'cechen_words.txt', 'cechen_words_master.txt', 'cechen_full_wordlist.txt',
+    'cechen_new_words_from_web.txt', 'cechen_words_from_razlib.txt',
+    'cechen_words_from_web_browser.txt', 'cechen_words_from_web.txt'
+]:
     p = os.path.join(ROOT, fn)
     if not os.path.exists(p):
         continue
@@ -244,10 +248,28 @@ def buildable(word, wheel):
 # ----------------------------------------------------------------------------
 rng = random.Random(20260614)
 
-# Zorluk eğrisi
-NUMW = [2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4]
-CAP = [3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6]
-BONUS = [0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4]
+# Zorluk eğrisi (100 seviye için dinamik kurulum)
+NUMW = []
+CAP = []
+BONUS = []
+for i in range(100):
+    if i < 15:
+        NUMW.append(2 if i < 6 else 3)
+        CAP.append(3 if i < 3 else 4)
+        BONUS.append(0 if i < 3 else (1 if i < 8 else 2))
+    elif i < 40:
+        NUMW.append(3)
+        CAP.append(4 if i < 25 else 5)
+        BONUS.append(2 if i < 25 else 3)
+    elif i < 70:
+        NUMW.append(4)
+        CAP.append(5 if i < 55 else 6)
+        BONUS.append(3 if i < 50 else (4 if i < 60 else 5))
+    else:
+        NUMW.append(4 if i < 85 else 5)
+        CAP.append(6 if i < 85 else 7)
+        BONUS.append(5 if i < 80 else (6 if i < 90 else 8))
+
 PAD_LETTERS = [normalize(x) for x in
                ['а', 'р', 'т', 'н', 'к', 'о', 'и', 'л', 'с', 'м', 'е', 'х', 'б', 'д', 'у', 'г']]
 
@@ -330,7 +352,7 @@ levels.append({
 })
 
 report = []
-for i in range(30):
+for i in range(100):
     num = NUMW[i]
     cap = CAP[i]
     res = build_grid(num, cap)
@@ -348,12 +370,21 @@ for i in range(30):
     for g, k in wheel.items():
         letters.extend([g] * k)
     rng.shuffle(letters)
+    pack_id = 1
+    if i + 1 > 75:
+      pack_id = 4
+    elif i + 1 > 50:
+      pack_id = 3
+    elif i + 1 > 25:
+      pack_id = 2
+
     levels.append({
         "id": i + 1,
         "letters": letters,
         "words": [{"word": p['word'], "row": p['row'], "col": p['col'], "dir": p['dir']}
                   for p in placement],
         "bonus": bonus,
+        "pack": pack_id,
     })
     report.append((i + 1, len(grid_words), grid_words, len(bonus), bonus, len(letters)))
 
@@ -369,7 +400,7 @@ for lv in levels:
 dups = {w: c for w, c in seen.items() if c > 1}
 if dups:
     raise SystemExit(f"TEKRAR VAR: {dups}")
-print("Tekrar yok ✓  Toplam benzersiz kelime:", len(seen))
+print("Tekrar yok OK  Toplam benzersiz kelime:", len(seen))
 
 # Test kısıtları
 game = levels[1:]
@@ -407,4 +438,4 @@ with open(ce_path, 'w', encoding='utf-8') as f:
 print(f"info_ anahtarları: {len(info)} (kullanılan {len(seen)} kelimeden)")
 print("\nSeviye raporu:")
 for (lid, ng, gw, nb, bw, nl) in report:
-    print(f"  S{lid:2d}: {ng} kelime {gw} | çark {nl} | {nb} bonus {bw}")
+    print(f"  S{lid:2d}: {ng} kelime | cark {nl} | {nb} bonus")

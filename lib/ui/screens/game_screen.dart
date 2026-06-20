@@ -74,6 +74,7 @@ class _GameScreenState extends State<GameScreen> {
   int _levelEarned = 0;
   bool _showComplete = false;
   bool _challengeBonusApplied = false;
+  bool _isHammerActive = false;
   Timer? _advanceTimer;
 
   /// Son bulunan bonus kelime — alt bilgi şeridinde açıklaması gösterilir;
@@ -174,6 +175,40 @@ class _GameScreenState extends State<GameScreen> {
   void _shuffle() {
     widget.sound.play(SoundCue.shuffle);
     _game.shuffle();
+  }
+
+  void _onCellTap(Cell cell) {
+    if (_isHammerActive) {
+      if (_game.cellFilled(cell)) return;
+      if (!_game.level.targetByCell.containsKey(cell)) return;
+      setState(() {
+        _isHammerActive = false;
+      });
+      _game.useTargetHint(cell);
+    }
+  }
+
+  void _toggleHammer() {
+    if (!_game.canTargetHint) return;
+    setState(() {
+      _isHammerActive = !_isHammerActive;
+    });
+    if (_isHammerActive) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(Strings.t('hint_hammer_select_cell')),
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 3),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          margin: const EdgeInsets.only(bottom: 20, left: 20, right: 20),
+        ),
+      );
+    }
+  }
+
+  void _useMagicWand() {
+    if (!_game.canMagicWand) return;
+    _game.useMagicWand();
   }
 
   String? _infoStripText;
@@ -316,6 +351,7 @@ class _GameScreenState extends State<GameScreen> {
                 CrosswordGrid(
                   key: ValueKey('grid_${level.id}'),
                   controller: _game,
+                  onCellTap: _onCellTap,
                 ),
               ],
             ),
@@ -336,12 +372,23 @@ class _GameScreenState extends State<GameScreen> {
         Row(
           children: [
             Expanded(
-              child: Center(
-                child: RoundIconButton(
-                  icon: Icons.shuffle_rounded,
-                  size: 54,
-                  onTap: _shuffle,
-                ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  RoundIconButton(
+                    icon: Icons.shuffle_rounded,
+                    size: 54,
+                    onTap: _shuffle,
+                  ),
+                  const SizedBox(height: 12),
+                  RoundIconButton(
+                    icon: Icons.auto_fix_high_rounded,
+                    size: 54,
+                    badge: '${GameConfig.magicWandCost}',
+                    enabled: _game.canMagicWand,
+                    onTap: _useMagicWand,
+                  ),
+                ],
               ),
             ),
             LetterWheel(
@@ -355,15 +402,28 @@ class _GameScreenState extends State<GameScreen> {
               onRelease: _game.releaseSelection,
             ),
             Expanded(
-              child: Center(
-                child: RoundIconButton(
-                  icon: Icons.lightbulb_rounded,
-                  size: 54,
-                  badge: '${GameConfig.hintCost}',
-                  enabled: _game.canHint,
-                  pulse: true,
-                  onTap: _game.useHint,
-                ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  RoundIconButton(
+                    icon: Icons.lightbulb_rounded,
+                    size: 54,
+                    badge: '${GameConfig.hintCost}',
+                    enabled: _game.canHint,
+                    pulse: !_isHammerActive && _game.canHint,
+                    onTap: _game.useHint,
+                  ),
+                  const SizedBox(height: 12),
+                  RoundIconButton(
+                    icon: Icons.gavel_rounded,
+                    size: 54,
+                    badge: '${GameConfig.targetHintCost}',
+                    enabled: _game.canTargetHint,
+                    pulse: _isHammerActive,
+                    highlighted: _isHammerActive,
+                    onTap: _toggleHammer,
+                  ),
+                ],
               ),
             ),
           ],

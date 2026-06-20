@@ -381,6 +381,76 @@ class GameController extends ChangeNotifier {
     notifyListeners();
   }
 
+  bool get canTargetHint =>
+      !levelDone &&
+      _coins >= Scoring.targetHintCost() &&
+      _hintCandidates().isNotEmpty;
+
+  /// Oyuncunun tıkladığı spesifik hücreyi açar.
+  void useTargetHint(Cell cell) {
+    if (!canTargetHint) return;
+    if (cellFilled(cell)) return;
+    if (!level.targetByCell.containsKey(cell)) return;
+
+    revealedCells.add(cell);
+    _hintsUsed++;
+    _streak = 0;
+    streakListenable.value = 0;
+    _coins -= Scoring.targetHintCost();
+    coinsListenable.value = _coins;
+    unawaited(store.setCoins(_coins));
+    unawaited(store.addCoinsSpent(Scoring.targetHintCost()));
+    unawaited(store.addHintUsed());
+    _events.add(HintRevealed(cell));
+    for (final word in level.words) {
+      if (!solvedWords.contains(word.word) && word.cells.every(cellFilled)) {
+        _solve(word, byHint: true);
+      }
+    }
+    if (!levelDone) _schedulePersist();
+    notifyListeners();
+  }
+
+  bool get canMagicWand =>
+      !levelDone &&
+      _coins >= Scoring.magicWandCost() &&
+      _hintCandidates().isNotEmpty;
+
+  /// Rastgele en fazla 3 hücreyi birden açar.
+  void useMagicWand() {
+    if (!canMagicWand) return;
+    final candidates = _hintCandidates();
+    final toOpenCount = min(3, candidates.length);
+    final selected = <Cell>[];
+    final pool = List<Cell>.from(candidates);
+    for (var i = 0; i < toOpenCount; i++) {
+      final idx = _random.nextInt(pool.length);
+      selected.add(pool.removeAt(idx));
+    }
+
+    for (final cell in selected) {
+      revealedCells.add(cell);
+      _hintsUsed++;
+      _events.add(HintRevealed(cell));
+    }
+
+    _streak = 0;
+    streakListenable.value = 0;
+    _coins -= Scoring.magicWandCost();
+    coinsListenable.value = _coins;
+    unawaited(store.setCoins(_coins));
+    unawaited(store.addCoinsSpent(Scoring.magicWandCost()));
+    unawaited(store.addHintUsed());
+
+    for (final word in level.words) {
+      if (!solvedWords.contains(word.word) && word.cells.every(cellFilled)) {
+        _solve(word, byHint: true);
+      }
+    }
+    if (!levelDone) _schedulePersist();
+    notifyListeners();
+  }
+
   void shuffle() {
     if (level.letters.length < 2) return;
     // Yeni liste: widget tarafı eski/yeni sırayı karşılaştırıp animasyon

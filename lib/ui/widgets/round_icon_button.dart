@@ -1,4 +1,6 @@
 import 'dart:math';
+import 'dart:ui';
+import 'package:flutter/foundation.dart';
 
 import 'package:flutter/material.dart';
 
@@ -16,6 +18,7 @@ class RoundIconButton extends StatefulWidget {
     this.badge,
     this.enabled = true,
     this.pulse = false,
+    this.highlighted = false,
   }) : assert(size >= 44, 'Touch target en az 44dp olmalı (Apple HIG)');
 
   final IconData icon;
@@ -24,6 +27,7 @@ class RoundIconButton extends StatefulWidget {
   final String? badge;
   final bool enabled;
   final bool pulse;
+  final bool highlighted;
 
   @override
   State<RoundIconButton> createState() => _RoundIconButtonState();
@@ -79,38 +83,93 @@ class _RoundIconButtonState extends State<RoundIconButton>
       scale: _pressed ? 0.94 : (lifted ? 1.05 : 1.0),
       duration: AppMotion.fast,
       curve: AppMotion.enter,
-      child: AnimatedContainer(
-        duration: AppMotion.base,
-        curve: AppMotion.enter,
-        width: widget.size,
-        height: widget.size,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: lifted ? AppColors.barButtonHover : AppColors.barButton,
-          border: Border.all(color: AppColors.barButtonBorder, width: 1.5),
-          boxShadow: [
-            if (_pressed)
-              const BoxShadow(
-                color: Color(0x1F000000),
-                blurRadius: 3,
-                offset: Offset(0, 1),
+      child: ClipOval(
+        child: kIsWeb
+            ? AnimatedContainer(
+                duration: AppMotion.base,
+                curve: AppMotion.enter,
+                width: widget.size,
+                height: widget.size,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: widget.highlighted
+                      ? AppColors.goldLight
+                      : (lifted ? AppColors.barButtonHover : AppColors.barButton),
+                  border: Border.all(
+                    color: widget.highlighted ? AppColors.goldBorder : AppColors.barButtonBorder,
+                    width: widget.highlighted ? 2.5 : 1.5,
+                  ),
+                  boxShadow: [
+                    if (_pressed)
+                      const BoxShadow(
+                        color: Color(0x1F000000),
+                        blurRadius: 3,
+                        offset: Offset(0, 1),
+                      )
+                    else if (lifted)
+                      const BoxShadow(
+                        color: Color(0x40000000),
+                        blurRadius: 14,
+                        offset: Offset(0, 6),
+                      )
+                    else
+                      const BoxShadow(
+                        color: Color(0x1F000000),
+                        blurRadius: 6,
+                        offset: Offset(0, 3),
+                      ),
+                  ],
+                ),
+                child: Icon(
+                  widget.icon,
+                  size: widget.size * 0.52,
+                  color: widget.highlighted ? AppColors.ink : Colors.white,
+                ),
               )
-            else if (lifted)
-              const BoxShadow(
-                color: Color(0x33000000),
-                blurRadius: 14,
-                offset: Offset(0, 6),
-              )
-            else
-              const BoxShadow(
-                color: Color(0x1F000000),
-                blurRadius: 6,
-                offset: Offset(0, 3),
+            : BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                child: AnimatedContainer(
+                  duration: AppMotion.base,
+                  curve: AppMotion.enter,
+                  width: widget.size,
+                  height: widget.size,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: widget.highlighted
+                        ? AppColors.goldLight
+                        : (lifted ? AppColors.barButtonHover : AppColors.barButton),
+                    border: Border.all(
+                      color: widget.highlighted ? AppColors.goldBorder : AppColors.barButtonBorder,
+                      width: widget.highlighted ? 2.5 : 1.5,
+                    ),
+                    boxShadow: [
+                      if (_pressed)
+                        const BoxShadow(
+                          color: Color(0x1F000000),
+                          blurRadius: 3,
+                          offset: Offset(0, 1),
+                        )
+                      else if (lifted)
+                        const BoxShadow(
+                          color: Color(0x40000000),
+                          blurRadius: 14,
+                          offset: Offset(0, 6),
+                        )
+                      else
+                        const BoxShadow(
+                          color: Color(0x1F000000),
+                          blurRadius: 6,
+                          offset: Offset(0, 3),
+                        ),
+                    ],
+                  ),
+                  child: Icon(
+                    widget.icon,
+                    size: widget.size * 0.52,
+                    color: widget.highlighted ? AppColors.ink : Colors.white,
+                  ),
+                ),
               ),
-          ],
-        ),
-        child:
-            Icon(widget.icon, size: widget.size * 0.52, color: AppColors.ink),
       ),
     );
 

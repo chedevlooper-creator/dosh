@@ -32,16 +32,15 @@ abstract final class AppColors {
   static const Color ink = Color(0xFF122C3D); // Navy / koyu lacivert metin
   static const Color inkSoft = Color(0xFF3A576B); // İkincil metin
   static const Color cardWhite = Color(0xE6FFFFFF);
-  // Boş hücre: keskin manzara üzerinde okunabilirlik için %65 opak
-  // koyu gri-mavi (buzlu cam hissi; ince ışık konturuyla birlikte çalışır).
-  static const Color cellEmpty = Color(0xA61E2B33);
-  static const Color wheelDisc = Color(0xFFF4EDDD); // Krem rengi çark zemini
-  static const Color wheelDiscEdge = Color(0xFFE9DCC0); // Çark dış kenar tonu
-  static const Color wheelBorder = Color(0xFFE5D5BA); // Çark kenar rengi
-  static const Color barButton = Color(0xFFFBF6EB); // Krem rengi buton arka planı
-  static const Color barButtonBorder = Color(0xFFE9DCC4); // Krem buton kenar rengi
-  static const Color barButtonHover = Color(0xFFF5EAD2);
-  static const Color darkPill = Color(0xE61C2A33); // Seviye rozet/bilgi zemini
+  // Boş hücre: keskin manzara üzerinde okunabilirlik için %35 opak koyu siyah
+  static const Color cellEmpty = Color(0x59000000);
+  static const Color wheelDisc = Color(0x59000000); // Koyu buzlu cam çark zemini
+  static const Color wheelDiscEdge = Color(0x40000000); // Dış kenar koyuluğu
+  static const Color wheelBorder = Color(0x33FFFFFF); // Cam kontur
+  static const Color barButton = Color(0x26FFFFFF); // Buzlu cam beyaz buton arka planı
+  static const Color barButtonBorder = Color(0x2BFFFFFF); // Cam sınır rengi
+  static const Color barButtonHover = Color(0x40FFFFFF); // Hover'da parlama
+  static const Color darkPill = Color(0x99000000); // Seviye rozet/bilgi zemini
   static const Color glassDark = Color(0x731A2B38); // Koyu buzlu cam yüzey
   static const Color glassLine = Color(0x40FFFFFF); // Cam yüzey üst ışık konturu
 }

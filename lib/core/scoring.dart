@@ -35,6 +35,12 @@ abstract final class Scoring {
   /// İpucu kullanımının coin maliyeti.
   static int hintCost() => GameConfig.hintCost;
 
+  /// Hedefli ipucu (Hammer) coin maliyeti.
+  static int targetHintCost() => GameConfig.targetHintCost;
+
+  /// Sihirli değnek (Magic Wand) coin maliyeti.
+  static int magicWandCost() => GameConfig.magicWandCost;
+
   /// Izgara dışı geçerli bonus kelime ödülü.
   static int bonusWord() => GameConfig.bonusWordCoins;
 

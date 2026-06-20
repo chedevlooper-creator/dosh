@@ -51,11 +51,11 @@ class ProgressStore {
 
   // --- Tema -----------------------------------------------------------------
 
-  /// 0=caucasus (varsayılan), 1=night, 2=forest
+  /// 0=caucasus (varsayılan), 1=night, 2=forest, 3=autumn, 4=winter
   int get themeIndex => _prefs.getInt(_kThemeIndex) ?? 0;
 
   Future<void> setThemeIndex(int value) =>
-      _prefs.setInt(_kThemeIndex, value.clamp(0, 2));
+      _prefs.setInt(_kThemeIndex, value.clamp(0, 4));
 
   // --- Seviye kilit sistemi -------------------------------------------------
 
@@ -279,4 +279,12 @@ class ProgressStore {
   Future<void> markDailyChallengeDone() async {
     await _prefs.setInt(_kChallengeDay, epochDay(DateTime.now()));
   }
+
+  static const _kTimeAttackHighScore = 'time_attack_high_score';
+
+  /// Zamana Karşı Yarış en yüksek skoru.
+  int get timeAttackHighScore => _prefs.getInt(_kTimeAttackHighScore) ?? 0;
+
+  Future<void> setTimeAttackHighScore(int value) =>
+      _prefs.setInt(_kTimeAttackHighScore, value);
 }

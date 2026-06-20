@@ -11,9 +11,14 @@ import '../theme.dart';
 /// Hücre boyutu mevcut alana göre hesaplanır; küçük ekranlarda otomatik
 /// küçülür. Harfler açıldıkça kademeli pop-in animasyonuyla yerleşir.
 class CrosswordGrid extends StatelessWidget {
-  const CrosswordGrid({super.key, required this.controller});
+  const CrosswordGrid({
+    super.key,
+    required this.controller,
+    this.onCellTap,
+  });
 
   final GameController controller;
+  final ValueChanged<Cell>? onCellTap;
 
   @override
   Widget build(BuildContext context) {
@@ -55,12 +60,16 @@ class CrosswordGrid extends StatelessWidget {
                     key: ValueKey('cell_${entry.key.row}_${entry.key.col}'),
                     left: (entry.key.col - level.minCol) * (cell + gap),
                     top: (entry.key.row - level.minRow) * (cell + gap),
-                    child: _LetterCell(
-                      letter: displayGrapheme(entry.value),
-                      size: cell,
-                      show: controller.cellFilled(entry.key),
-                      solved: _solvedWordCovers(entry.key),
-                      delayMs: delays[entry.key] ?? 0,
+                    child: GestureDetector(
+                      onTap: () => onCellTap?.call(entry.key),
+                      behavior: HitTestBehavior.opaque,
+                      child: _LetterCell(
+                        letter: displayGrapheme(entry.value),
+                        size: cell,
+                        show: controller.cellFilled(entry.key),
+                        solved: _solvedWordCovers(entry.key),
+                        delayMs: delays[entry.key] ?? 0,
+                      ),
                     ),
                   ),
               ],
@@ -165,16 +174,26 @@ class _LetterCellState extends State<_LetterCell>
                 )
               : null,
           color: visible && solved ? null : AppColors.cellEmpty,
-          // İnce ışık konturu: hücreleri yoğun fotoğraf üzerinde tanımlar.
+          // İnce ışık konturu veya ipucu durumunda altın kontur
           border: visible && solved
               ? null
-              : Border.all(color: const Color(0x2EFFFFFF), width: 1),
+              : Border.all(
+                  color: visible ? const Color(0x80F5B62B) : const Color(0x2EFFFFFF),
+                  width: visible ? 1.5 : 1.0,
+                ),
           boxShadow: [
             if (visible && solved)
               const BoxShadow(
-                color: Color(0x59D9961A),
-                blurRadius: 10,
-                offset: Offset(0, 3),
+                color: Color(0x99F5B62B),
+                blurRadius: 12,
+                spreadRadius: 1,
+                offset: Offset(0, 2),
+              )
+            else if (visible && !solved)
+              const BoxShadow(
+                color: Color(0x4DF5B62B),
+                blurRadius: 8,
+                offset: Offset(0, 1),
               )
             else
               const BoxShadow(

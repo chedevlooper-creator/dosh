@@ -20,6 +20,7 @@ class HomeScreen extends StatefulWidget {
     required this.theme,
     required this.onStart,
     this.onDailyChallenge,
+    this.onTimeAttack,
     this.onStats,
     this.onDictionary,
     this.onSettings,
@@ -31,6 +32,7 @@ class HomeScreen extends StatefulWidget {
   final SceneTheme theme;
   final VoidCallback onStart;
   final VoidCallback? onDailyChallenge;
+  final VoidCallback? onTimeAttack;
   final VoidCallback? onStats;
   final VoidCallback? onDictionary;
   final VoidCallback? onSettings;
@@ -140,10 +142,21 @@ class _HomeScreenState extends State<HomeScreen> {
                             if (!tiny)
                             Padding(
                               padding: const EdgeInsets.only(top: 10),
-                              child: _DailyChallengeCard(
-                                done: widget.store.dailyChallengeDone,
-                                levelNumber: ProgressStore.dailyLevelIndex(widget.levels.length),
-                                onTap: widget.onDailyChallenge ?? () {},
+                              child: Wrap(
+                                spacing: 12,
+                                runSpacing: 10,
+                                alignment: WrapAlignment.center,
+                                children: [
+                                  _DailyChallengeCard(
+                                    done: widget.store.dailyChallengeDone,
+                                    levelNumber: ProgressStore.dailyLevelIndex(widget.levels.length),
+                                    onTap: widget.onDailyChallenge ?? () {},
+                                  ),
+                                  _TimeAttackCard(
+                                    highScore: widget.store.timeAttackHighScore,
+                                    onTap: widget.onTimeAttack ?? () {},
+                                  ),
+                                ],
                               ),
                             ),
                             const Spacer(),
@@ -1245,4 +1258,84 @@ class _UnderlinePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _UnderlinePainter oldDelegate) => false;
+}
+
+/// Zamana Karşı Yarış kartı — home ekranında başlık altında gösterilir.
+class _TimeAttackCard extends StatelessWidget {
+  const _TimeAttackCard({
+    required this.highScore,
+    required this.onTap,
+  });
+
+  final int highScore;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      label: 'Zamana karşı yarış, en yüksek skor $highScore',
+      button: true,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(18),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(18),
+              gradient: const LinearGradient(
+                colors: [Color(0xFFFF8A65), Color(0xFFFF7043), Color(0xFFF4511E)],
+              ),
+              border: Border.all(
+                color: const Color(0xFFFFCCBC),
+                width: 1.5,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0x33F4511E).withOpacity(0.2),
+                  blurRadius: 12,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(
+                  Icons.timer_rounded,
+                  color: AppColors.ink,
+                  size: 26,
+                ),
+                const SizedBox(width: 12),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      Strings.t('time_attack_title'),
+                      style: const TextStyle(
+                        color: AppColors.ink,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      Strings.t('time_attack_high_score').replaceAll('%d', highScore.toString()),
+                      style: TextStyle(
+                        color: AppColors.ink.withOpacity(0.85),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }

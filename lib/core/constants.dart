@@ -2,6 +2,8 @@
 abstract final class GameConfig {
   static const int startCoins = 100;
   static const int hintCost = 25;
+  static const int targetHintCost = 35;
+  static const int magicWandCost = 60;
   static const int coinsPerGrapheme = 5;
 
   /// Izgarada olmayan ama geçerli olan bonus kelimenin sabit ödülü.

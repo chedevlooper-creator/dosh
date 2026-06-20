@@ -300,16 +300,31 @@ class _ThemeSelector extends StatelessWidget {
         icon: Icons.forest_rounded,
         colors: const [Color(0xFF5B9F6B), Color(0xFFD4E8C8)],
       ),
+      _ThemeOption(
+        index: 3,
+        label: Strings.t('settings_theme_autumn'),
+        icon: Icons.eco_rounded,
+        colors: const [Color(0xFFC84B31), Color(0xFFFFD56B)],
+      ),
+      _ThemeOption(
+        index: 4,
+        label: Strings.t('settings_theme_winter'),
+        icon: Icons.ac_unit_rounded,
+        colors: const [Color(0xFF1D3557), Color(0xFFA8DADC)],
+      ),
     ];
 
-    return Row(
-      children: [
-        for (final theme in themes) ...[
-          if (theme.index > 0) const SizedBox(width: 12),
-          Expanded(
-            child: GestureDetector(
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      clipBehavior: Clip.none,
+      child: Row(
+        children: [
+          for (final theme in themes) ...[
+            if (theme.index > 0) const SizedBox(width: 12),
+            GestureDetector(
               onTap: () => onChanged(theme.index),
               child: AnimatedContainer(
+                width: 96,
                 duration: AppMotion.base,
                 padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
                 decoration: BoxDecoration(
@@ -357,9 +372,9 @@ class _ThemeSelector extends StatelessWidget {
                 ),
               ),
             ),
-          ),
+          ],
         ],
-      ],
+      ),
     );
   }
 }

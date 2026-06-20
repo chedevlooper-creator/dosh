@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -11,10 +12,11 @@ import 'ui/screens/home_screen.dart';
 import 'ui/screens/settings_screen.dart';
 import 'ui/screens/stats_screen.dart';
 import 'ui/screens/dictionary_screen.dart';
+import 'ui/screens/time_attack_screen.dart';
 import 'ui/theme.dart';
 import 'ui/widgets/scenic_background.dart';
 
-enum _AppScreen { home, gallery, game, settings, stats, dictionary }
+enum _AppScreen { home, gallery, game, settings, stats, dictionary, timeAttack }
 
 class DoshApp extends StatefulWidget {
   const DoshApp({
@@ -68,11 +70,13 @@ class _DoshAppState extends State<DoshApp> {
       title: Strings.t('app_title'),
       debugShowCheckedModeBanner: false,
       theme: buildTheme(),
-      home: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 420),
-        switchInCurve: Curves.easeOutCubic,
-        switchOutCurve: Curves.easeInCubic,
-        child: _buildScreen(),
+      home: WebMobileWrapper(
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 420),
+          switchInCurve: Curves.easeOutCubic,
+          switchOutCurve: Curves.easeInCubic,
+          child: _buildScreen(),
+        ),
       ),
     );
   }
@@ -88,6 +92,7 @@ class _DoshAppState extends State<DoshApp> {
           theme: _theme,
           onStart: _goGallery,
           onDailyChallenge: _startDailyChallenge,
+          onTimeAttack: _goTimeAttack,
           onStats: _goStats,
           onDictionary: _goDictionary,
           onSettings: _goSettings,
@@ -143,6 +148,15 @@ class _DoshAppState extends State<DoshApp> {
           onHowToPlay: _onHowToPlay,
           onBack: _goHome,
         );
+      case _AppScreen.timeAttack:
+        return TimeAttackScreen(
+          key: const ValueKey('timeAttack'),
+          levels: widget.levels,
+          store: widget.store,
+          sound: _sound,
+          theme: _theme,
+          onBack: _goHome,
+        );
     }
   }
 
@@ -164,6 +178,11 @@ class _DoshAppState extends State<DoshApp> {
   void _goDictionary() {
     _sound.play(SoundCue.tap);
     setState(() => _screen = _AppScreen.dictionary);
+  }
+
+  void _goTimeAttack() {
+    _sound.play(SoundCue.tap);
+    setState(() => _screen = _AppScreen.timeAttack);
   }
 
   void _goGallery() {
@@ -195,5 +214,48 @@ class _DoshAppState extends State<DoshApp> {
     if (!mounted) return;
     _sound.play(SoundCue.tap);
     setState(() => _screen = _AppScreen.gallery);
+  }
+}
+
+/// Enforces mobile aspect ratio (centered portrait column) on wide screens (desktop web).
+class WebMobileWrapper extends StatelessWidget {
+  const WebMobileWrapper({super.key, required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF0F172A), // Premium dark navy backdrop
+      body: Center(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final double screenWidth = constraints.maxWidth;
+            final double screenHeight = constraints.maxHeight;
+
+            if (kIsWeb && screenWidth > 600) {
+              final double mobileWidth = (screenHeight * 9 / 16).clamp(360.0, 480.0);
+              return Container(
+                width: mobileWidth,
+                height: screenHeight,
+                decoration: const BoxDecoration(
+                  color: Colors.black,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Color(0x73000000),
+                      blurRadius: 40,
+                      spreadRadius: 5,
+                    ),
+                  ],
+                ),
+                child: child,
+              );
+            }
+
+            return child;
+          },
+        ),
+      ),
+    );
   }
 }

@@ -27,6 +27,7 @@ flutter:
     - assets/levels/
     - assets/audio/
     - assets/fonts/
+    - assets/images/
 
   fonts:
     - family: NotoSans

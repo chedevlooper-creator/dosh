@@ -1,4 +1,6 @@
 import 'dart:math';
+import 'dart:ui';
+import 'package:flutter/foundation.dart';
 
 import 'package:flutter/material.dart';
 
@@ -176,25 +178,50 @@ class _LetterWheelState extends State<LetterWheel>
             return Stack(
               clipBehavior: Clip.none,
               children: [
-                // Çark zemini
-                Container(
-                  width: widget.size,
-                  height: widget.size,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColors.wheelDisc,
-                    border: Border.all(
-                      color: const Color(0x66FFFFFF),
-                      width: 2,
-                    ),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color(0x40000000),
-                        blurRadius: 18,
-                        offset: Offset(0, 6),
-                      ),
-                    ],
-                  ),
+                // Çark zemini (frosted glass on mobile, high opacity solid on web)
+                ClipOval(
+                  child: kIsWeb
+                      ? Container(
+                          width: widget.size,
+                          height: widget.size,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: const Color(0xE6050C1A), // Dark translucent glass background
+                            border: Border.all(
+                              color: AppColors.wheelBorder,
+                              width: 2,
+                            ),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Color(0x40000000),
+                                blurRadius: 18,
+                                offset: Offset(0, 6),
+                              ),
+                            ],
+                          ),
+                        )
+                      : BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 7, sigmaY: 7),
+                          child: Container(
+                            width: widget.size,
+                            height: widget.size,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: AppColors.wheelDisc,
+                              border: Border.all(
+                                color: AppColors.wheelBorder,
+                                width: 2,
+                              ),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Color(0x40000000),
+                                  blurRadius: 18,
+                                  offset: Offset(0, 6),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
                 ),
                 // Çeçen koçboynuzu motifli orta madalyon (dekoratif)
                 const Positioned.fill(
@@ -279,71 +306,87 @@ class _BubbleState extends State<_Bubble> {
         onEnter: (_) => setState(() => _hovered = true),
         onExit: (_) => setState(() => _hovered = false),
         child: AnimatedScale(
-        scale: selected ? 1.18 : (_hovered ? 1.08 : 1.0),
-        duration: AppMotion.fast,
-        curve: AppMotion.enter,
-        child: Container(
-          width: r * 2,
-          height: r * 2,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            // Seçili harfler için altın parlama efekti; seçilmemişler için şeffaf zemin.
-            gradient: selected
-                ? const RadialGradient(
-                    center: Alignment(-0.35, -0.42),
-                    radius: 1.25,
-                    colors: [
-                      Color(0xFFFFF3C0),
-                      Color(0xFFFFE48A),
-                      AppColors.goldLight,
-                      AppColors.gold,
-                    ],
-                    stops: [0, 0.35, 0.72, 1],
+          scale: selected ? 1.18 : (_hovered ? 1.08 : 1.0),
+          duration: AppMotion.fast,
+          curve: AppMotion.enter,
+          child: Container(
+            width: r * 2,
+            height: r * 2,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: selected
+                  ? const RadialGradient(
+                      center: Alignment(-0.35, -0.42),
+                      radius: 1.25,
+                      colors: [
+                        Color(0xFFFFF3C0),
+                        Color(0xFFFFE48A),
+                        AppColors.goldLight,
+                        AppColors.gold,
+                      ],
+                      stops: [0, 0.35, 0.72, 1],
+                    )
+                  : const RadialGradient(
+                      center: Alignment(-0.35, -0.42),
+                      radius: 1.25,
+                      colors: [
+                        Color(0x3DFFFFFF),
+                        Color(0x14FFFFFF),
+                      ],
+                    ),
+              border: Border.all(
+                color: selected ? const Color(0xCCFFF6D8) : const Color(0x33FFFFFF),
+                width: selected ? 1.6 : 1.2,
+              ),
+              boxShadow: [
+                if (selected)
+                  const BoxShadow(
+                    color: Color(0x99F5B62B),
+                    blurRadius: 16,
+                    spreadRadius: 1,
                   )
-                : null,
-            border: selected
-                ? Border.all(color: const Color(0xCCFFF6D8), width: 1.6)
-                : null,
-            boxShadow: [
-              if (selected)
-                const BoxShadow(
-                  color: Color(0x99F5B62B),
-                  blurRadius: 16,
-                  spreadRadius: 1,
-                ),
-            ],
-          ),
-          child: Center(
-            child: Padding(
-              padding: EdgeInsets.all(r * 0.16),
-              // Digraflar (ХЬ, КӀ...) tek karakterden geniştir; scaleDown
-              // yalnızca sığmayanı küçültür, tek harfleri büyütmez.
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Text(
-                  widget.label,
-                  style: TextStyle(
-                    fontFamily: AppText.displayFamily,
-                    fontFamilyFallback: AppText.displayFallback,
-                    fontSize: r * 0.96,
-                    fontWeight: FontWeight.bold,
-                    color: selected ? Colors.white : AppColors.ink,
-                    shadows: selected
-                        ? const [
-                            Shadow(
-                              color: Color(0x59000000),
-                              blurRadius: 4,
-                              offset: Offset(0, 2),
-                            ),
-                          ]
-                        : null,
+                else
+                  const BoxShadow(
+                    color: Color(0x1A000000),
+                    blurRadius: 4,
+                    offset: Offset(0, 2),
+                  ),
+              ],
+            ),
+            child: Center(
+              child: Padding(
+                padding: EdgeInsets.all(r * 0.16),
+                child: FittedBox(
+                  child: Text(
+                    widget.label,
+                    style: TextStyle(
+                      fontFamily: AppText.displayFamily,
+                      fontFamilyFallback: AppText.displayFallback,
+                      fontSize: r * 0.96,
+                      fontWeight: FontWeight.bold,
+                      color: selected ? Colors.white : const Color(0xFFE2F0FD),
+                      shadows: selected
+                          ? const [
+                              Shadow(
+                                color: Color(0x59000000),
+                                blurRadius: 4,
+                                offset: Offset(0, 2),
+                              ),
+                            ]
+                          : const [
+                              Shadow(
+                                color: Color(0x40000000),
+                                blurRadius: 3,
+                                offset: Offset(0, 1),
+                              ),
+                            ],
+                    ),
                   ),
                 ),
               ),
             ),
           ),
         ),
-      ),
       ),
     );
   }
@@ -399,6 +442,29 @@ class _SelectionLinePainter extends CustomPainter {
         Paint()..color = AppColors.gold,
       );
     }
+
+    // Çizgi ve sürükleme son noktası etrafında parıldayan parçacık izi (Particle Trail)
+    if (pointer != null) {
+      final rand = Random(pointer!.dx.hashCode ^ pointer!.dy.hashCode);
+      final particlePaint = Paint()
+        ..color = AppColors.goldLight.withValues(alpha: 0.82)
+        ..style = PaintingStyle.fill;
+
+      for (var i = 0; i < 8; i++) {
+        final angle = rand.nextDouble() * 2 * pi;
+        final distance = rand.nextDouble() * 20.0;
+        final size = 1.2 + rand.nextDouble() * 3.2;
+        final offset = pointer! + Offset(cos(angle), sin(angle)) * distance;
+        
+        if (i.isEven) {
+          final glow = Paint()
+            ..color = AppColors.goldLight.withValues(alpha: 0.3)
+            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2.0);
+          canvas.drawCircle(offset, size * 2.0, glow);
+        }
+        canvas.drawCircle(offset, size, particlePaint);
+      }
+    }
   }
 
   @override
@@ -435,11 +501,11 @@ class _OrnamentPainter extends CustomPainter {
     canvas.drawCircle(center, radius * 0.27, ring);
 
     final horn = Paint()
-      ..color = const Color(0x6BD9961A)
+      ..color = const Color(0xB3F5B62B)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.8
       ..strokeCap = StrokeCap.round;
-    final dot = Paint()..color = const Color(0x59D9961A);
+    final dot = Paint()..color = const Color(0x80F5B62B);
 
     for (var i = 0; i < 8; i++) {
       canvas.save();
