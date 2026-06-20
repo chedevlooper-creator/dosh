@@ -41,8 +41,8 @@ class GalleryScreen extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    _Header(onBack: onBack),
-                    const SizedBox(height: 12),
+                    _Header(onBack: onBack, store: store, levels: levels),
+                    const SizedBox(height: 8),
                     Expanded(
                       child: _GalleryGrid(
                         levels: levels,
@@ -62,55 +62,118 @@ class GalleryScreen extends StatelessWidget {
 }
 
 class _Header extends StatelessWidget {
-  const _Header({required this.onBack});
+  const _Header({
+    required this.onBack,
+    required this.store,
+    required this.levels,
+  });
 
   final VoidCallback onBack;
+  final ProgressStore store;
+  final List<Level> levels;
 
   @override
   Widget build(BuildContext context) {
+    final completed = store.completedLevels(levels.length);
+    final total = levels.length - 1; // tutorial hariç
+    final progress = total > 0 ? completed / total : 0.0;
+
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      child: Row(
+      padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
+      child: Column(
         children: [
-          Semantics(
-            label: 'Ana sayfaya dön',
-            button: true,
-            child: InkWell(
-              onTap: onBack,
-              borderRadius: BorderRadius.circular(999),
-              child: Container(
-                width: 44,
-                height: 44,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: const Color(0xDDFBF6EB),
-                  border: Border.all(color: const Color(0xAAFFFFFF), width: 1.5),
+          Row(
+            children: [
+              Semantics(
+                label: 'Ana sayfaya dön',
+                button: true,
+                child: InkWell(
+                  onTap: onBack,
+                  borderRadius: BorderRadius.circular(999),
+                  child: Container(
+                    width: 44,
+                    height: 44,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: const Color(0xDDFBF6EB),
+                      border: Border.all(
+                        color: const Color(0xAAFFFFFF),
+                        width: 1.5,
+                      ),
+                    ),
+                    child: const Icon(
+                      Icons.arrow_back_rounded,
+                      color: AppColors.ink,
+                      size: 22,
+                    ),
+                  ),
                 ),
-                child: const Icon(
-                  Icons.arrow_back_rounded,
-                  color: AppColors.ink,
-                  size: 22,
+              ),
+              const SizedBox(width: 12),
+              const Expanded(
+                child: Center(
+                  child: Text(
+                    'Дош',
+                    style: TextStyle(
+                      fontFamily: AppText.displayFamily,
+                      fontFamilyFallback: AppText.displayFallback,
+                      fontSize: 28,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.ink,
+                    ),
+                  ),
                 ),
+              ),
+              const SizedBox(width: 56),
+            ],
+          ),
+          const SizedBox(height: 8),
+          // Toplam ilerleme
+          ClipRRect(
+            borderRadius: BorderRadius.circular(999),
+            child: SizedBox(
+              height: 22,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Container(color: const Color(0x66FBF6EB)),
+                  FractionallySizedBox(
+                    alignment: Alignment.centerLeft,
+                    widthFactor: progress.clamp(0.0, 1.0),
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            AppColors.goldDark,
+                            AppColors.gold,
+                            AppColors.goldLight,
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Center(
+                    child: Text(
+                      '$completed / $total ${Strings.t('level').toLowerCase()}',
+                      style: const TextStyle(
+                        color: AppColors.ink,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w900,
+                        shadows: [
+                          Shadow(
+                            color: Color(0x99FFFFFF),
+                            blurRadius: 4,
+                            offset: Offset(0, 1),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
-          const SizedBox(width: 12),
-          const Expanded(
-            child: Center(
-              child: Text(
-                'Дош',
-                style: TextStyle(
-                  fontFamily: AppText.displayFamily,
-                  fontFamilyFallback: AppText.displayFallback,
-                  fontSize: 28,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.ink,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 56),
         ],
       ),
     );
@@ -129,8 +192,7 @@ class _GalleryGrid extends StatelessWidget {
   final ValueChanged<int> onPick;
 
   /// Tutorial seviyesi (id=0) hariç seviyeler.
-  List<Level> get _gameLevels =>
-      levels.where((l) => l.id != 0).toList();
+  List<Level> get _gameLevels => levels.where((l) => l.id != 0).toList();
 
   Map<int, List<Level>> get _packs {
     final map = <int, List<Level>>{};
@@ -155,6 +217,21 @@ class _GalleryGrid extends StatelessWidget {
     }
   }
 
+  String _packSubtitle(int pack) {
+    switch (pack) {
+      case 1:
+        return 'Дош а, хьанж а';
+      case 2:
+        return 'Хьанж а, боьярш а';
+      case 3:
+        return 'ГӀирс а, ойла а';
+      case 4:
+        return 'Уггаре дара а, зор а';
+      default:
+        return 'Дешнаш';
+    }
+  }
+
   void _showLockedHint(BuildContext context, int levelId) {
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
@@ -174,36 +251,21 @@ class _GalleryGrid extends StatelessWidget {
     return CustomScrollView(
       slivers: [
         for (final entry in packs.entries) ...[
+          // ── Pack başlığı (+ progress) ──
           SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-              child: Row(
-                children: [
-                  Container(
-                    width: 6,
-                    height: 22,
-                    decoration: BoxDecoration(
-                      color: AppColors.gold,
-                      borderRadius: BorderRadius.circular(3),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Text(
-                    _packTitle(entry.key),
-                    style: const TextStyle(
-                      fontFamily: AppText.displayFamily,
-                      fontFamilyFallback: AppText.displayFallback,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.ink,
-                    ),
-                  ),
-                ],
-              ),
+            child: _PackHeader(
+              title: _packTitle(entry.key),
+              subtitle: _packSubtitle(entry.key),
+              completed: entry.value
+                  .where((l) => store.starsFor(l.id) > 0)
+                  .length,
+              total: entry.value.length,
+              store: store,
             ),
           ),
+          // ── Seviye ızgarası ──
           SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
             sliver: SliverGrid.builder(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 4,
@@ -232,6 +294,117 @@ class _GalleryGrid extends StatelessWidget {
           ),
         ],
       ],
+    );
+  }
+}
+
+/// Paket başlığı — isim, alt başlık, tamamlanma yüzdesi.
+class _PackHeader extends StatelessWidget {
+  const _PackHeader({
+    required this.title,
+    required this.subtitle,
+    required this.completed,
+    required this.total,
+    required this.store,
+  });
+
+  final String title;
+  final String subtitle;
+  final int completed;
+  final int total;
+  final ProgressStore store;
+
+  @override
+  Widget build(BuildContext context) {
+    final pct = total > 0 ? completed / total : 0.0;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 6,
+                height: 22,
+                decoration: BoxDecoration(
+                  color: AppColors.gold,
+                  borderRadius: BorderRadius.circular(3),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                title,
+                style: const TextStyle(
+                  fontFamily: AppText.displayFamily,
+                  fontFamilyFallback: AppText.displayFallback,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.ink,
+                ),
+              ),
+              const Spacer(),
+              Text(
+                '$completed/$total',
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w800,
+                  color: Color(0xCC122C3D),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 2),
+          Padding(
+            padding: const EdgeInsets.only(left: 16),
+            child: Text(
+              subtitle,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: Color(0x99122C3D),
+              ),
+            ),
+          ),
+          const SizedBox(height: 6),
+          // Pack progress bar
+          ClipRRect(
+            borderRadius: BorderRadius.circular(999),
+            child: SizedBox(
+              height: 5,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Container(color: const Color(0x44FBF6EB)),
+                  TweenAnimationBuilder<double>(
+                    tween: Tween<double>(begin: 0, end: pct.clamp(0.0, 1.0)),
+                    duration: const Duration(milliseconds: 600),
+                    curve: Curves.easeOutCubic,
+                    builder: (context, value, _) {
+                      return FractionallySizedBox(
+                        alignment: Alignment.centerLeft,
+                        widthFactor: value,
+                        child: Container(
+                          decoration: const BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                AppColors.goldDark,
+                                AppColors.gold,
+                                AppColors.goldLight,
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -4,6 +4,7 @@ import '../../core/constants.dart';
 import '../../core/strings.dart';
 import '../../data/progress_store.dart';
 import '../theme.dart';
+import '../widgets/animated_count.dart';
 import '../widgets/scenic_background.dart';
 
 /// Sözlük ekranı: oyuncunun çözdüğü tüm kelimeleri Çeçence → Türkçe
@@ -94,8 +95,16 @@ class _DictionaryScreenState extends State<DictionaryScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: Row(
                           children: [
+                            AnimatedCount(
+                              target: entries.length,
+                              style: const TextStyle(
+                                color: Color(0x99122C3D),
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                             Text(
-                              '${entries.length} ${Strings.t('dictionary_word')}',
+                              ' ${Strings.t('dictionary_word')}',
                               style: const TextStyle(
                                 color: Color(0x99122C3D),
                                 fontSize: 13,
@@ -134,11 +143,14 @@ class _DictionaryScreenState extends State<DictionaryScreen> {
                                 final meaning = Strings.tOrNull(
                                   'info_${entry.key}',
                                 );
-                                return _WordTile(
-                                  word: entry.key,
-                                  meaning: meaning,
-                                  levelId: entry.value.$1,
-                                  isBonus: entry.value.$2,
+                                return StaggerItem(
+                                  index: i,
+                                  child: _WordTile(
+                                    word: entry.key,
+                                    meaning: meaning,
+                                    levelId: entry.value.$1,
+                                    isBonus: entry.value.$2,
+                                  ),
                                 );
                               },
                             ),

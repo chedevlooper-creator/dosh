@@ -162,7 +162,7 @@ class _SettingsBody extends StatelessWidget {
             title: sound.enabled ? 'Açık' : 'Kapalı',
             trailing: Switch.adaptive(
               value: sound.enabled,
-              activeThumbColor: AppColors.gold,
+              activeColor: AppColors.gold,
               onChanged: (_) => sound.toggle(),
             ),
           ),

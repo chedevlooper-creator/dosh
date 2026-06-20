@@ -58,11 +58,17 @@ class ScenicBackground extends StatelessWidget {
           ),
         ),
 
-        // 2. Weather & Atmospheric Effects Overlay
+        // 2. Weather & Atmospheric Effects Overlay (tema değişince crossfade)
         Positioned.fill(
-          child: CustomPaint(
-            painter: _MountainScenePainter(theme: theme),
-            size: Size.infinite,
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 600),
+            switchInCurve: Curves.easeOutQuad,
+            switchOutCurve: Curves.easeInQuad,
+            child: CustomPaint(
+              key: ValueKey('scene_${theme.name}'),
+              painter: _MountainScenePainter(theme: theme),
+              size: Size.infinite,
+            ),
           ),
         ),
 
