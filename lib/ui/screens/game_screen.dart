@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../audio/game_sound.dart';
 import '../../core/constants.dart';
@@ -284,6 +285,7 @@ class _GameScreenState extends State<GameScreen> {
                 bestStreak: _game.bestStreak,
                 allDone: _game.isLastLevel,
                 onContinue: _continueNext,
+                onShare: _shareLevelResult,
               ),
             ),
         ],
@@ -308,6 +310,17 @@ class _GameScreenState extends State<GameScreen> {
       _levelEarned = 0;
     });
     _game.nextLevel();
+  }
+
+  void _shareLevelResult() {
+    widget.sound.play(SoundCue.tap);
+    final template = _game.isLastLevel
+        ? Strings.t('share_all_done_text')
+        : Strings.t('share_level_text');
+    final text = template
+        .replaceAll('{level}', '${_game.levelNumber}')
+        .replaceAll('{stars}', '${_game.performanceStars}');
+    unawaited(SharePlus.instance.share(ShareParams(text: text)));
   }
 
   Widget _buildGameColumn(BoxConstraints constraints) {

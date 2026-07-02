@@ -14,6 +14,7 @@ class LevelCompletePanel extends StatelessWidget {
     required this.bestStreak,
     this.allDone = false,
     required this.onContinue,
+    this.onShare,
   });
 
   /// Bu seviyede kazanılan toplam coin (0 ise satır gizlenir).
@@ -29,6 +30,9 @@ class LevelCompletePanel extends StatelessWidget {
   final bool allDone;
 
   final VoidCallback onContinue;
+
+  /// Verilirse buton altında küçük bir "Paylaş" bağlantısı gösterilir.
+  final VoidCallback? onShare;
 
   @override
   Widget build(BuildContext context) {
@@ -152,6 +156,38 @@ class LevelCompletePanel extends StatelessWidget {
                     ),
                   ),
                 ),
+                if (onShare != null) ...[
+                  const SizedBox(height: 12),
+                  InkWell(
+                    onTap: onShare,
+                    borderRadius: BorderRadius.circular(999),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.share_rounded,
+                            size: 16,
+                            color: AppColors.ink,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            Strings.t('share'),
+                            style: const TextStyle(
+                              color: AppColors.ink,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
