@@ -16,12 +16,14 @@ class StatsScreen extends StatelessWidget {
     required this.theme,
     required this.levelCount,
     required this.onBack,
+    this.onAchievements,
   });
 
   final ProgressStore store;
   final SceneTheme theme;
   final int levelCount;
   final VoidCallback onBack;
+  final VoidCallback? onAchievements;
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +52,7 @@ class StatsScreen extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    _StatsHeader(onBack: onBack),
+                    _StatsHeader(onBack: onBack, onAchievements: onAchievements),
                     const SizedBox(height: 8),
                     Expanded(
                       child: ListView(
@@ -105,9 +107,10 @@ class StatsScreen extends StatelessWidget {
 }
 
 class _StatsHeader extends StatelessWidget {
-  const _StatsHeader({required this.onBack});
+  const _StatsHeader({required this.onBack, this.onAchievements});
 
   final VoidCallback onBack;
+  final VoidCallback? onAchievements;
 
   @override
   Widget build(BuildContext context) {
@@ -153,7 +156,32 @@ class _StatsHeader extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(width: 56),
+          Semantics(
+            label: Strings.t('achievements'),
+            button: true,
+            child: InkWell(
+              onTap: onAchievements,
+              borderRadius: BorderRadius.circular(999),
+              child: Container(
+                width: 44,
+                height: 44,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: const Color(0xDDFBF6EB),
+                  border: Border.all(
+                    color: const Color(0xAAFFFFFF),
+                    width: 1.5,
+                  ),
+                ),
+                child: const Icon(
+                  Icons.emoji_events_rounded,
+                  color: AppColors.gold,
+                  size: 22,
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
