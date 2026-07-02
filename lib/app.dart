@@ -6,6 +6,7 @@ import 'audio/game_sound.dart';
 import 'core/strings.dart';
 import 'data/models.dart';
 import 'data/progress_store.dart';
+import 'ui/screens/achievements_screen.dart';
 import 'ui/screens/game_screen.dart';
 import 'ui/screens/gallery_screen.dart';
 import 'ui/screens/home_screen.dart';
@@ -17,7 +18,16 @@ import 'ui/theme.dart';
 import 'ui/widgets/page_transition.dart';
 import 'ui/widgets/scenic_background.dart';
 
-enum _AppScreen { home, gallery, game, settings, stats, dictionary, timeAttack }
+enum _AppScreen {
+  home,
+  gallery,
+  game,
+  settings,
+  stats,
+  dictionary,
+  timeAttack,
+  achievements,
+}
 
 class DoshApp extends StatefulWidget {
   const DoshApp({
@@ -142,6 +152,15 @@ class _DoshAppState extends State<DoshApp> {
           theme: _theme,
           levelCount: widget.levels.length,
           onBack: _goHome,
+          onAchievements: _goAchievements,
+        );
+      case _AppScreen.achievements:
+        return AchievementsScreen(
+          key: const ValueKey('achievements'),
+          store: widget.store,
+          theme: _theme,
+          levelCount: widget.levels.length,
+          onBack: _goStats,
         );
       case _AppScreen.dictionary:
         return DictionaryScreen(
@@ -194,6 +213,14 @@ class _DoshAppState extends State<DoshApp> {
     setState(() {
       _previousScreen = _screen;
       _screen = _AppScreen.stats;
+    });
+  }
+
+  void _goAchievements() {
+    _sound.play(SoundCue.tap);
+    setState(() {
+      _previousScreen = _screen;
+      _screen = _AppScreen.achievements;
     });
   }
 
