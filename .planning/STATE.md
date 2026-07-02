@@ -9,13 +9,14 @@ See: `.planning/PROJECT.md` (updated 2026-06-17)
 ## Current Status: Phase 7 Complete ✅
 
 ### Phase 6 — Content (Done)
-- Levels 21-30 already integrated (richer than generated)
-- bonus_candidates.json: 21-30 added, 0-20 synced (531 total)
-- 85 info_* word meanings in ce.json (curated sources only)
+- Levels 21-100 already integrated (101 total levels, IDs 0–100)
+- Non-Chechen words removed from levels 62, 80, 81, 88, 89, 94 (was: Russian)
+- 112 info_* word meanings in ce.json
+- i18n: added level_52..level_100 keys to ce.json
 
 ### Phase 7 — Game Improvement (Done)
-- **20 new levels (31-50)** — no word repetition with existing levels
-- **51 total levels** (0-50) with increasing difficulty curve
+- **71 new levels (31-100)** — no word repetition with existing levels
+- **101 total levels** (0-100) with increasing difficulty curve
 - **Stats screen expanded**: lifetime counters
 - **GameController updated**: auto-increment counters
 - **Info strip**: every solved word shows meaning for 3 seconds
@@ -24,8 +25,8 @@ See: `.planning/PROJECT.md` (updated 2026-06-17)
 - **Store-ready assets**: new app icon, adaptive icons, splash screen, feature graphic, store listing copy (TR/EN/CE)
 - **Free publishing pipeline**: web build verified, Netlify config, GitHub Actions workflow for Pages + Netlify + APK release, landing page, itch.io & F-Droid templates
 - **Level model**: added `pack` field
-- **i18n**: added `level` + level_31..level_50 keys, plus stats keys
-- **levels_test.dart updated**: bonus curve test adapted for 50 levels
+- **i18n**: added `level_0` + level_1..level_100 keys, plus stats keys
+- **levels_test.dart updated**: bonus curve test adapted for 101 levels
 - **flutter test 43/43 PASS** ✅
 
 ### Not started
@@ -46,4 +47,4 @@ See: `.planning/PROJECT.md` (updated 2026-06-17)
 None identified.
 
 ---
-*Last updated: 2026-06-17 — 51 levels, info strip, daily challenge card, thematic packs, all tests passing*
+*Last updated: 2026-07-02 — 101 levels, Russian words removed, all level_* keys in ce.json, info strip, daily challenge card, thematic packs, all tests passing*

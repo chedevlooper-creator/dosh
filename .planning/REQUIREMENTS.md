@@ -26,9 +26,9 @@
 
 ### Content
 
-- [ ] **CONT-01**: Level 21-30 with real Chechen words
-- [ ] **CONT-02**: Word meanings (info_*) for solved words where source available
-- [ ] **CONT-03**: Bonus word candidates integrated from curated lists
+- [x] **CONT-01**: Level 21-100 with real Chechen words
+- [x] **CONT-02**: Word meanings (info_*) for solved words where source available
+- [x] **CONT-03**: Bonus word candidates integrated from curated lists
 
 ### UI/UX
 
@@ -99,7 +99,7 @@
 | AUDIO-01 through AUDIO-05 | Phase 3 (Audio) | Complete |
 | PLAT-01 through PLAT-05 | Phase 4 (Platform) | Complete |
 | QUAL-01 through QUAL-06 | Phase 5 (Quality) | Complete |
-| CONT-01 through CONT-03 | Phase 6 (Content) | In Progress |
+| CONT-01 through CONT-03 | Phase 6 (Content) | Complete |
 
 **Coverage:**
 - v1 requirements: 31 total
